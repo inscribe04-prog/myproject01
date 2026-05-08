@@ -1,0 +1,22 @@
+/* public/css/form.css */
+/* All styles for form.htm live here */
+
+.form-container {
+  float: left;
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  padding: 20px;
+}
+
+/* Error message spans — red, small */
+.err {
+  color: red;
+  font-size: 12px;
+}
+
+/* Character counter spans — default gray */
+.counter {
+  font-size: 12px;
+  color: gray;
+}

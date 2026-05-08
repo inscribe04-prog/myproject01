@@ -1,0 +1,19 @@
+# .gitignore
+# ─────────────────────────────────────────────
+# Files and folders listed here are NEVER
+# tracked by Git or uploaded to GitHub
+# ─────────────────────────────────────────────
+
+# Environment variables — contains your secrets
+
+.env
+
+# Node modules — huge folder, never upload this
+# Anyone who clones your project runs npm install to get them back
+
+node_modules/
+
+# OS files — created automatically by Windows/Mac, not needed
+
+.DS_Store
+Thumbs.db

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head><title>Register</title></head>
+<body>
+  <h2>Create Account</h2>
+
+  <!-- id="regForm" so JS can find it -->
+  <form id="regForm">
+    <input type="text"     id="regFirst"  placeholder="First name"><br><br>
+    <input type="text"     id="regLast"   placeholder="Last name"><br><br>
+    <input type="email"    id="regEmail"  placeholder="Email address"><br><br>
+    <input type="password" id="regPass"   placeholder="Password (min 8 chars)"><br><br>
+    <button type="submit">Register</button>
+  </form>
+
+  <p id="regMsg" style="color:red"></p>
+  <p>Already have an account? <a href="index.htm">Login here</a></p>
+
+<!-- Single script tag — all JS is in /js/register.js -->
+<script src="/js/register.js"></script>
