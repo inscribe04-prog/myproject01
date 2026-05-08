@@ -19,6 +19,10 @@ console.log("form.js loaded");
         'Welcome, ' + user.firstname + '!';
     });
     
+
+
+document.getElementById('showTableBtn').addEventListener('click', loadEntries);
+
 // ════════════════════════════════════════════
 // SECTION 1 — LIVE INPUT LISTENERS
 // These run instantly as the user types/changes
@@ -216,8 +220,16 @@ function loadEntries() {
   fetch('/yentries')
     .then(res => res.json())
     .then(rows => {
-      let html  = '<table border="1" cellpadding="6">';
-      html += '<tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Numeric</th><th>Password</th><th>Email</th><th>Phone</th><th>Quantity</th><th>Age</th><th>Guardian</th><th>Rel Status</th><th>Spouse</th><th>Edit</th><th>Delete</th></tr>';
+      // let html  = '<table border="1" cellpadding="6">';
+      // html += '<tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Numeric</th><th>Password</th><th>Email</th><th>Phone</th><th>Quantity</th><th>Age</th><th>Guardian</th><th>Rel Status</th><th>Spouse</th><th>Edit</th><th>Delete</th></tr>';
+      
+      // table table-striped table-hover = alternating rows + hover highlight
+      // table-responsive = horizontal scroll on mobile
+      let html = '<div class="table-responsive"><table class="table table-striped table-hover align-middle">';
+      html += '<thead class="table-dark"><tr>';
+      html += '<th>ID</th><th>First Name</th><th>Last Name</th><th>Numeric</th><th>Password</th><th>Email</th><th>Phone</th><th>Quantity</th><th>Age</th><th>Guardian</th><th>Rel Status</th><th>Spouse</th><th>Edit</th><th>Delete</th>';
+      html += '</tr></thead><tbody>';
+      
       rows.forEach(row => {
         html += `<tr>
           <td>${row.id}</td>
@@ -232,11 +244,14 @@ function loadEntries() {
           <td>${row.guardian}</td>
           <td>${row.relstatus}</td>
           <td>${row.spousename}</td>
-          <td><button onclick="editRow(${row.id},'${row.firstname}','${row.lastname}','${row.ankval}','${row.inpass}','${row.email}','${row.phone}','${row.quantity}','${row.age}','${row.guardian}','${row.relstatus}','${row.spousename}')">Edit</button></td>
-          <td><button onclick="deleteRow(${row.id})">Delete</button></td>
+          <td><button class="btn btn-sm btn-outline-primary me-1"
+          onclick="editRow(${row.id},'${row.firstname}','${row.lastname}','${row.ankval}','${row.inpass}','${row.email}','${row.phone}','${row.quantity}','${row.age}','${row.guardian}','${row.relstatus}','${row.spousename}')">Edit</button></td>
+          <td><button class="btn btn-sm btn-outline-danger"
+          onclick="deleteRow(${row.id})">Delete</button></td>
         </tr>`;
       });
-      html += '</table>';
+      // html += '</table>';
+      html += '</tbody></table></div>'
       document.getElementById('tableArea').innerHTML = html;
     });
 }
@@ -249,13 +264,30 @@ function editRow(id, firstname, lastname, ankval, inpass, email, phone, quantity
   const newEmail     = prompt('New Email:', email);
   const newPhone     = prompt('New Phone:', phone);
   const newQuantity  = prompt('New Quantity:', quantity);
-  const newAge       = prompt('New Age:', age);
-  const newGuardian  = prompt('New Guardian Name:', guardian);
-  const newRelStatus = prompt('New Relationship Status:', relstatus);
-  const newSpouse    = prompt('New Spouse Name:', spousename);
+  // const newAge       = prompt('New Age:', age);
+  // const newGuardian  = prompt('New Guardian Name:', guardian);
+  // const newRelStatus = prompt('New Relationship Status:', relstatus);
+  // const newSpouse    = prompt('New Spouse Name:', spousename);
 
-  if ([newFirst, newLast, newNumeric, newPWD, newEmail, newPhone,
-       newQuantity, newAge, newGuardian, newRelStatus, newSpouse].includes(null)) return;
+// Logic for Age/Guardian
+  let newAge = prompt('New Age:', age);
+  let newGuardian = '';
+  if (Number(newAge) < 18) {
+      newGuardian = prompt('New Guardian Name (Required for < 18):', guardian);
+  }
+
+  // Logic for Relationship/Spouse
+  let newRelStatus = prompt('New Relationship Status (married/separated/unmarried):', relstatus);
+  let newSpouse = '';
+  if (newRelStatus === 'married') {
+      newSpouse = prompt('New Spouse Name (Required for married):', spousename);
+  }
+
+  // If the user hits "Cancel" on any prompt, stop here
+  if ([newFirst, newLast, newNumeric, newPWD, newEmail, newPhone, newQuantity, newAge, newRelStatus].includes(null)) return;
+
+  // if ([newFirst, newLast, newNumeric, newPWD, newEmail, newPhone,
+  //      newQuantity, newAge, newGuardian, newRelStatus, newSpouse].includes(null)) return;
 
   fetch('/yupdate', {
     method: 'POST',
@@ -282,4 +314,4 @@ function deleteRow(id) {
 }
 
 // Load table on page open
-loadEntries();
+// loadEntries();

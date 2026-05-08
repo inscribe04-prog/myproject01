@@ -45,7 +45,10 @@ document.getElementById('regForm').addEventListener('submit', function(e) {
         if (data.success) {
           window.location.href = '/index.htm'; // redirect to login
         } else {
-          document.getElementById('regMsg').textContent = data.error;
+          // document.getElementById('regMsg').textContent = data.error;
+          const msg = document.getElementById('regMsg');
+                      msg.textContent = 'Please fill all fields correctly';
+                      msg.classList.remove('d-none');
         }
       });
     });

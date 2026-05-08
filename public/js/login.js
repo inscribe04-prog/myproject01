@@ -47,7 +47,11 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
             // redirect to the protected page after login
             window.location.href = '/form.htm';
         } else {
-          document.getElementById('loginMsg').textContent = data.error;
+          //document.getElementById('loginMsg').textContent = data.error;
+
+          const msg = document.getElementById('loginMsg');
+                      msg.textContent = data.error;
+                      msg.classList.remove('d-none');
         }
       });
     });

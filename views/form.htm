@@ -4,96 +4,198 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HTML Forms</title>
-  <link rel="stylesheet" href="/css/form.css">
+  <!-- <link rel="stylesheet" href="/css/form.css"> -->
+
+  <!-- Bootstrap 5 CSS — paste this in every <head> -->
+  <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+  >
 </head>
 
-<body>
+<body class="bg-light">
+
+<!-- navbar = Bootstrap navbar component -->
+<!-- navbar-dark bg-dark = dark background with white text -->
+<!-- navbar-expand-lg = collapses to hamburger on mobile -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+  <div class="container">
+
+    <!-- navbar-brand = your app name on the left -->
+    <a class="navbar-brand fw-bold" href="#">MyProject01</a>
+
+    <!-- hamburger button — shows on mobile -->
+    <button class="navbar-toggler" type="button"
+      data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- collapse = hidden on mobile, visible on desktop -->
+    <div class="collapse navbar-collapse" id="navMenu">
+      <!-- ms-auto = push links to the right -->
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <span id="welcomeMsg" class="nav-link text-light"></span>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/logout">Logout</a>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</nav>
+
+
+  <div class="form-container">
+
+
+  <div class="container py-4">
 
  <!-- In form.htm — add this near the top of body -->
   <p id="welcomeMsg"></p>
   <a href="/logout">Logout</a>
 
+  <!-- Welcome message from session! In form.htm — this near the top of body -->
+  <p id="welcomeMsg" class="text-muted"></p>
+  <a href="/logout" class="btn btn-outline-secondary btn-sm float-end">Logout</a>
 
-<div class="form-container">
- 
-  <h3>Form Implementation</h3>
-  <p>2nd Form — Action, Method, AutoComplete, noValidate</p>
 
-  <form id="myForm" autocomplete="on" novalidate name="BadaForm">
+<!-- <div class="form-container"> -->
 
-    <label for="fnaam">Enter First Name</label><br>
-    <input type="text" id="fnaam" name="fn01" placeholder="First name"><br>
-    <span id="firstErr" class="err"></span>
-    <span id="fnameCount" class="counter">0 characters</span>
+  <div class="card shadow mb-4">
+    <div class="card-body p-4">
+      <h4 class="mb-4">Form Implementation</h4>
+        <p class="mb-3"> Form — AutoComplete, noValidate</p>
 
-    <br><label for="lnaam">Enter Last Name</label><br>
-    <input type="text" id="lnaam" name="fn02" placeholder="Last name"><br>
-    <span id="lastErr" class="err"></span>
-    <span id="lnameCount" class="counter">0 characters</span>
+        <div id="myForm" autocomplete="on" novalidate name="BadaForm">
 
-    <br><label for="num01">Enter Some Numerical Value</label><br>
-    <input type="text" id="num01" name="number1" placeholder="Some number"><br>
-    <span id="numErr" class="err"></span>
 
-    <br><label for="pwd01">Enter Password</label><br>
-    <input type="password" id="pwd01" name="password01" placeholder="Password"><br>
-    <span id="pwdErr" class="err"></span>
-    <span id="pwdCount" class="counter">0 characters</span>
-    <span id="strengthMsg"></span>
+    <!-- Two columns side by side for first + last name -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Enter First Name</label>
+            <input type="text" id="fnaam" name="fn01" class="form-control" placeholder="First name">
+            <span id="firstErr" class="text-danger small"></span>
+            <span id="fnameCount" class="text-muted small">0 characters</span>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Enter Last Name</label>
+            <input type="text" id="lnaam" name="fn02" class="form-control" placeholder="Last name">
+            <span id="lastErr" class="text-danger small"></span>
+            <span id="lnameCount" class="text-muted small">0 characters</span>
+          </div>
+        </div>
 
-    <br><label for="confirmInput">Confirm Password</label><br>
-    <input type="password" id="confirmInput" placeholder="Confirm password"><br>
-    <span id="matchMsg"></span>
+        <div class="mb-3">     
+            <label class="form-label">Enter Some Numerical Value</label>
+            <input type="text" id="num01" name="number1" placeholder="Some number" class="form-control">
+            <span id="numErr" class="text-muted small">bmd</span>
+        </div>
 
-    <br><label for="email01">Enter Email</label><br>
-    <input type="email" id="email01" name="email01" placeholder="Email address"><br>
-    <span id="emailErr" class="err"></span>
 
-    <br><label for="phone01">Enter Phone Number</label><br>
-    <input type="tel" id="phone01" name="phone01" placeholder="10 digit phone number"><br>
-    <span id="phoneErr" class="err"></span>
+    <!-- Two columns side by side for Password + Confirm Password -->
 
-    <br><label for="quantity01">Enter Quantity</label><br>
-    <input type="number" id="quantity01" name="quantity01" placeholder="Quantity"><br>
-    <span id="quantityErr" class="err"></span>
+        <!-- Password with strength indicator -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Password</label>
+            <input type="password" id="pwd01" name="password01" class="form-control" placeholder="Password">
+            <span id="pwdErr" class="text-danger small"></span>
+            <span id="pwdCount" class="text-muted small">0 characters</span>
+            <span id="strengthMsg" class="small fw-bold"></span>
+          </div>
+          
+          <div class="col-md-6">
+            <label class="form-label">Confirm Password</label>
+            <input type="password" id="confirmInput" placeholder="Confirm password" class="form-control">
+            <span id="matchMsg" class="text-danger small"></span>
+          </div>
+        </div>
 
-    <br><label for="ageInput">Enter Your Age</label><br>
-    <input type="number" id="ageInput" name="age" placeholder="Your age"><br>
-    <span id="ageErr" class="err"></span>
 
-    <div id="guardianSection" style="display:none">
-      <br><label>Guardian Name (required if under 18)</label><br>
-      <input type="text" id="guardianInput" name="guardian" placeholder="Guardian name"><br>
-      <span id="guardianErr" class="err"></span>
+    <!-- Two columns side by side for Email + Phone Number -->
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="email01" class="form-label">Enter Email</label>
+            <input type="email" id="email01" name="email01" placeholder="Email address" class="form-control">
+            <span id="emailErr" class="text-muted small"></span>
+          </div>
+
+          <div class="col-md-6">
+            <label for="phone01" class="form-label">Enter Phone Number</label>
+            <input type="tel" id="phone01" name="phone01" placeholder="10 digit phone number" class="form-control">
+            <span id="phoneErr" class="text-muted small"></span>
+          </div>
+        </div>
+
+        
+        <div class="mb-3">
+          <label for="quantity01" class="form-label">Enter Quantity</label>
+          <input type="number" id="quantity01" name="quantity01" placeholder="Quantity" class="form-control">
+          <span id="quantityErr" class="text-muted small"></span>
+        </div>
+
+        <!-- Two columns side by side for Age + Guardian -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="ageInput" class="form-label">Enter Your Age (years) implements conditional logic</label>
+            <input type="number" id="ageInput" name="age" placeholder="Your Age" class="form-control">
+            <span id="ageErr" class="text-danger small"></span>
+          </div>
+          <div class="col-md-6" id="guardianSection" style="display:none">
+            <label>Guardian Name (required if under 18)</label>
+            <input type="text" id="guardianInput" name="guardian" placeholder="Guardian name" class="form-control">
+            <span id="guardianErr" class="text-danger small"></span>
+          </div>
+        </div>
+
+  <!-- Relationship Status dropdown Two columns side by side for Relationship Status + Spouse Name -->                                                  
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Relationship Status</label>
+            <!-- form-select = Bootstrap styled dropdown -->
+            <select id="relStatus" name="relstatus" class="form-select">
+            <option value="">Select Status</option>
+            <option value="married">Married</option>
+            <option value="separated">Separated</option>
+            <option value="unmarried">Unmarried</option>
+            </select>
+            <span id="relErr" class="text-danger small"></span>
+          </div>
+          <div class="col-md-6" id="spouseSection" style="display:none">
+            <label for="spouseInput">Spouse Name (required if married)</label>
+            <input type="text" id="spouseInput" name="spousename" placeholder="Spouse name" class="form-control">
+            <span id="spouseErr" class="text-danger small"></span>
+          </div>
+        </div>
+
+    <!-- <br><br>
+    <input type="submit" id="sbutt1" name="submeet01" value="Submit"> -->
+
+        <button type="submit" class="btn btn-primary w-100 mt-2" id="sbutt1" name="submeet01" value="Submit">Save Entry</button>
+
+        </form>
+
+      <!-- Success message -->
+      <p id="msg" class="text-success fw-bold mt-3"></p>
+
     </div>
-
-    <br><label for="relStatus">Relationship Status</label><br>
-    <select id="relStatus" name="relstatus">
-      <option value="">Select status</option>
-      <option value="married">Married</option>
-      <option value="separated">Separated</option>
-      <option value="unmarried">Unmarried</option>
-    </select>
-    <span id="relErr" class="err"></span>
-
-    <div id="spouseSection" style="display:none">
-      <br><label for="spouseInput">Spouse Name (required if married)</label><br>
-      <input type="text" id="spouseInput" name="spousename" placeholder="Spouse name"><br>
-      <span id="spouseErr" class="err"></span>
-    </div>
-
-    <br><br>
-    <input type="submit" id="sbutt1" name="submeet01" value="Submit">
-
-  </form>
-
-  <p id="msg" style="color:green; font-weight:bold;"></p>
-
-  <br>
-  <p>Form entries from database:</p>
+  </div>
+  
+  <p>Form entries from database: CLick on the button below to view them</p>
+  <button type="button" class="btn btn-primary w-100 mt-2" id="showTableBtn">Show Table of Entries</button>
   <div id="tableArea"></div>
+  
 
 </div>
+</div>
+
+
+<!-- Bootstrap JS — paste before closing </body> -->
+<!-- Needed for navbar toggle, dropdowns, modals -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <!-- Single script tag — all JS is in /js/form.js -->
 <script src="/js/form.js"></script>
