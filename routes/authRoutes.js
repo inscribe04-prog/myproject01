@@ -20,6 +20,7 @@ function dbQuery(query, params) {
 // you just write: const results = await dbQuery(sql, [params])
 
 
+
 // ── REGISTER ─────────────────────────────────────────────────────
 router.post('/register', async (req, res) => {
   const { firstname, lastname, email, password } = req.body;

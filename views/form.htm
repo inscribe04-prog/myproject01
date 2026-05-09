@@ -47,18 +47,16 @@
 </nav>
 
 
-  <div class="form-container">
-
 
   <div class="container py-4">
 
- <!-- In form.htm — add this near the top of body -->
+ <!-- In form.htm — add this near the top of body
   <p id="welcomeMsg"></p>
-  <a href="/logout">Logout</a>
+  <a href="/logout">Logout</a> -->
 
-  <!-- Welcome message from session! In form.htm — this near the top of body -->
+  <!-- Welcome message from session! In form.htm — this near the top of body
   <p id="welcomeMsg" class="text-muted"></p>
-  <a href="/logout" class="btn btn-outline-secondary btn-sm float-end">Logout</a>
+  <a href="/logout" class="btn btn-outline-secondary btn-sm float-end">Logout</a> -->
 
 
 <!-- <div class="form-container"> -->
@@ -68,29 +66,30 @@
       <h4 class="mb-4">Form Implementation</h4>
         <p class="mb-3"> Form — AutoComplete, noValidate</p>
 
-        <div id="myForm" autocomplete="on" novalidate name="BadaForm">
+        <form id ="myForm" autocomplete="on" novalidate name="BadaForm">
 
 
     <!-- Two columns side by side for first + last name -->
         <div class="row mb-3">
           <div class="col-md-6">
             <label class="form-label">Enter First Name</label>
-            <input type="text" id="fnaam" name="fn01" class="form-control" placeholder="First name">
+            <input type="text" id="fnaam" name="fn01" class="form-control" placeholder="First Name">
             <span id="firstErr" class="text-danger small"></span>
-            <span id="fnameCount" class="text-muted small">0 characters</span>
+            <span id="fnameCount">0 character</span>
           </div>
           <div class="col-md-6">
             <label class="form-label">Enter Last Name</label>
-            <input type="text" id="lnaam" name="fn02" class="form-control" placeholder="Last name">
-            <span id="lastErr" class="text-danger small"></span>
-            <span id="lnameCount" class="text-muted small">0 characters</span>
+            <input type="text" id="lnaam" name="fn02" class="form-control" placeholder="Last Name">
+            <span id="lastErr" class="text-muted small"></span>
+            <span id="lnameCount">0 character</span>
           </div>
         </div>
 
         <div class="mb-3">     
-            <label class="form-label">Enter Some Numerical Value</label>
-            <input type="text" id="num01" name="number1" placeholder="Some number" class="form-control">
-            <span id="numErr" class="text-muted small">bmd</span>
+            <label class="form-label">Enter ASIN</label>
+            <input type="number" id="num01" name="number1" placeholder="ASIN (0-99)" class="form-control">
+            <span id="numCount">0 digit</span>
+            <p><span id="numErr" class="text-muted small" style="font-style: italic;">ASIN is a 2-digit number.</span></p>
         </div>
 
 
@@ -102,13 +101,15 @@
             <label class="form-label">Password</label>
             <input type="password" id="pwd01" name="password01" class="form-control" placeholder="Password">
             <span id="pwdErr" class="text-danger small"></span>
-            <span id="pwdCount" class="text-muted small">0 characters</span>
             <span id="strengthMsg" class="small fw-bold"></span>
+            <span id="pwdCount">0 character</span>
+
+            
           </div>
           
           <div class="col-md-6">
             <label class="form-label">Confirm Password</label>
-            <input type="password" id="confirmInput" placeholder="Confirm password" class="form-control">
+            <input type="password" id="confirmInput" placeholder="Confirm Password" class="form-control">
             <span id="matchMsg" class="text-danger small"></span>
           </div>
         </div>
@@ -125,7 +126,7 @@
 
           <div class="col-md-6">
             <label for="phone01" class="form-label">Enter Phone Number</label>
-            <input type="tel" id="phone01" name="phone01" placeholder="10 digit phone number" class="form-control">
+            <input type="tel" id="phone01" name="phone01" placeholder="10-digit Phone Number" class="form-control">
             <span id="phoneErr" class="text-muted small"></span>
           </div>
         </div>
@@ -133,38 +134,41 @@
         
         <div class="mb-3">
           <label for="quantity01" class="form-label">Enter Quantity</label>
-          <input type="number" id="quantity01" name="quantity01" placeholder="Quantity" class="form-control">
-          <span id="quantityErr" class="text-muted small"></span>
+          <input type="number" id="quantity01" name="quantity01" placeholder="Quantity (0-99)" class="form-control">
+          <span id="quantityCount">0 digit</span>
+          <p><span id="quantityErr" class="text-muted small" style="font-style: italic;">Quantity is a 2-digit number.</span></p>
         </div>
 
         <!-- Two columns side by side for Age + Guardian -->
         <div class="row mb-3">
           <div class="col-md-6">
             <label for="ageInput" class="form-label">Enter Your Age (years) implements conditional logic</label>
-            <input type="number" id="ageInput" name="age" placeholder="Your Age" class="form-control">
+            <input type="number" id="ageInput" name="age" placeholder="Age (0-199)" class="form-control">
             <span id="ageErr" class="text-danger small"></span>
           </div>
-          <div class="col-md-6" id="guardianSection" style="display:none">
+          <div class="col-md-6" id="guardianSection" style="display:none" class= "form-label">
             <label>Guardian Name (required if under 18)</label>
             <input type="text" id="guardianInput" name="guardian" placeholder="Guardian name" class="form-control">
             <span id="guardianErr" class="text-danger small"></span>
           </div>
         </div>
 
+        
+
   <!-- Relationship Status dropdown Two columns side by side for Relationship Status + Spouse Name -->                                                  
         <div class="row mb-3">
           <div class="col-md-6">
-            <label class="form-label">Relationship Status</label>
+            <label class="form-label">Marital Status</label>
             <!-- form-select = Bootstrap styled dropdown -->
-            <select id="relStatus" name="relstatus" class="form-select">
-            <option value="">Select Status</option>
+            <select id="relStatus" name="relstatus" class="form-select" aria-placeholder="Select Status">
+            <option value="notdisclose">Not Disclosing</option>
+            <option value="unmarried">Unmarried</option>
             <option value="married">Married</option>
             <option value="separated">Separated</option>
-            <option value="unmarried">Unmarried</option>
             </select>
             <span id="relErr" class="text-danger small"></span>
           </div>
-          <div class="col-md-6" id="spouseSection" style="display:none">
+          <div class="col-md-6" id="spouseSection" style="display:none" class="form-label">
             <label for="spouseInput">Spouse Name (required if married)</label>
             <input type="text" id="spouseInput" name="spousename" placeholder="Spouse name" class="form-control">
             <span id="spouseErr" class="text-danger small"></span>
@@ -174,7 +178,7 @@
     <!-- <br><br>
     <input type="submit" id="sbutt1" name="submeet01" value="Submit"> -->
 
-        <button type="submit" class="btn btn-primary w-100 mt-2" id="sbutt1" name="submeet01" value="Submit">Save Entry</button>
+        <button type="submit" class="btn btn-outline-success w-100 mt-2" id="sbutt1" name="submeet01" value="Submit">Save Entry</button>
 
         </form>
 
@@ -184,12 +188,12 @@
     </div>
   </div>
   
-  <p>Form entries from database: CLick on the button below to view them</p>
-  <button type="button" class="btn btn-primary w-100 mt-2" id="showTableBtn">Show Table of Entries</button>
+  <h5>Form entries from database:</h5>
+  <p>Click on the button below to view them</p>
+  <button type="button" class="btn btn-outline-warning w-100 mt-2" id="showTableBtn">Show Table of Entries</button>
   <div id="tableArea"></div>
   
 
-</div>
 </div>
 
 

@@ -11,6 +11,31 @@
 
 console.log("form.js loaded");
 
+
+
+// ════════════════════════════════════════════
+// SHARED VALIDATION HELPER
+// ════════════════════════════════════════════
+function getValidationErrors(d) {
+  let err = {};
+  if (!d.fn01 || d.fn01.length < 3) err.fn01 = "First name min 3 chars";
+  if (!d.fn02 || d.fn02.length < 3) err.fn02 = "Last name min 3 chars";
+  if (isNaN(d.number1 ) || d.number1 < 0 || d.number1.length < 2)             err.number1 = "ASIN value is required and should be a 2-digit number";
+  if (d.password01.length < 8)      err.password01 = "Password min 8 chars";
+  if (!d.email01.includes('@'))     err.email = "Invalid email";
+  if (!/^\d{10}$/.test(d.phone01))  err.phone = "10 digit phone required";
+  if (isNaN(d.quantity01) || d.quantity01 < 0 || d.quantity01.length < 2)          err.qty = "Quantity must be a number";
+  if (d.age < 0 || d.age > 199)      err.age = "Enter valid age (0-199)";
+  
+  // Logic checks
+  if (d.age < 18 && !d.guardian)    err.guardian = "Guardian name required for minors";
+  if (d.relstatus === 'married' && !d.spousename) err.spouse = "Spouse name required";
+  
+  return err;
+}
+
+
+
 // fetch current user info and show their name
   fetch('/me')
     .then(res => res.json())
@@ -18,7 +43,7 @@ console.log("form.js loaded");
       document.getElementById('welcomeMsg').textContent =
         'Welcome, ' + user.firstname + '!';
     });
-    
+
 
 
 document.getElementById('showTableBtn').addEventListener('click', loadEntries);
@@ -32,23 +57,81 @@ document.getElementById('showTableBtn').addEventListener('click', loadEntries);
 document.getElementById('fnaam').addEventListener('input', function() {
   const len     = this.value.length;
   const counter = document.getElementById('fnameCount');
-  counter.textContent = len + ' characters';
-  counter.style.color = len < 3 ? 'red' : 'green';
+  const error   = document.getElementById('firstErr'); // Added this
+  counter.textContent = len + ' character' + (len > 1 ? 's' : '') + ' entered';
+  counter.style.color = len < 3  ? 'red' : 'green';
+
+  // Clear the error message as soon as they type 3 characters
+  if (len >= 3) {
+      error.textContent = ''; 
+  }
+
 });
 
 // Last name character counter
 document.getElementById('lnaam').addEventListener('input', function() {
   const len     = this.value.length;
   const counter = document.getElementById('lnameCount');
-  counter.textContent = len + ' characters';
+  const error   = document.getElementById('lastErr'); // Added this
+
+  counter.textContent = len + ' character' + (len > 1 ? 's' : '') + ' entered';
   counter.style.color = len < 3 ? 'red' : 'green';
+
+  // Clear the error message as soon as they type 3 characters
+  if (len >= 3) {
+      error.textContent = ''; 
+  }
+
 });
+
+
+
+// ASIN character counter
+document.getElementById('num01').addEventListener('input', function() {
+  const len     = this.value.length;
+  const counter = document.getElementById('numCount');
+  const error   = document.getElementById('numErr'); // Added this
+
+  counter.textContent = len + ' digit' + (len > 1 ? 's' : '') + ' entered';
+  counter.style.color = len <= 2 ? 'green' : 'red';
+  // Clear the error message as soon as they type 2 characters
+  if (len >= 2) {
+      error.textContent = ''; 
+  }
+
+  // Optionally, you could also prevent them from typing more than 2 characters:
+  if (len > 2) {
+      this.value = this.value.slice(0, 2);
+  }
+}); 
+
+//Quantity character counter
+document.getElementById('quantity01').addEventListener('input', function() {
+  const len     = this.value.length;
+  const counter = document.getElementById('quantityCount');
+  const error   = document.getElementById('quantityErr'); // Added this
+
+  counter.textContent = len + ' digit' + (len > 1 ? 's' : '') + ' entered';
+  counter.style.color = len <= 2 ? 'green' : 'red';
+
+  // Clear the error message as soon as they type 2 characters
+  if (len >= 2) {
+      error.textContent = ''; 
+  }
+
+  // Optionally, you could also prevent them from typing more than 2 characters:
+  if (len > 2) {
+      this.value = this.value.slice(0, 2);
+  }
+}); 
+
+
 
 // Password character counter
 document.getElementById('pwd01').addEventListener('input', function() {
   const len     = this.value.length;
   const counter = document.getElementById('pwdCount');
-  counter.textContent = len + ' characters';
+  counter.textContent = len + ' character' + (len > 1 ? 's' : '') + ' entered';
   counter.style.color = len < 8 ? 'red' : 'green';
 });
 
@@ -64,7 +147,7 @@ document.getElementById('pwd01').addEventListener('input', function() {
     /[!@#$%^&*]/.test(pass)
   ].filter(Boolean).length;
 
-  if      (score <= 2) { msg.textContent = 'Weak';   msg.style.color = 'red';    }
+  if      (score <= 2)  { msg.textContent = 'Weak';   msg.style.color = 'red';    }
   else if (score === 3) { msg.textContent = 'Fair';   msg.style.color = 'orange'; }
   else if (score === 4) { msg.textContent = 'Good';   msg.style.color = 'blue';   }
   else                  { msg.textContent = 'Strong'; msg.style.color = 'green';  }
@@ -92,6 +175,8 @@ document.getElementById('ageInput').addEventListener('input', function() {
   }
 });
 
+
+
 // Relationship status — show/hide spouse section
 document.getElementById('relStatus').addEventListener('change', function() {
   const spouseSection = document.getElementById('spouseSection');
@@ -115,13 +200,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   myForm.addEventListener('submit', function(e) {
     e.preventDefault();
+    
+  // 1. Clear all error messages using a loop
+    document.querySelectorAll('.text-danger').forEach(el => el.textContent = '');
 
-    // 1. Clear all old error messages
-    ['firstErr','lastErr','numErr','pwdErr','emailErr',
-     'phoneErr','quantityErr','guardianErr','ageErr',
-     'relErr','spouseErr'].forEach(id => {
-      document.getElementById(id).textContent = '';
-    });
+
 
     // 2. Grab all values
     const firstname  = document.getElementById('fnaam').value.trim();
@@ -138,39 +221,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const pass       = document.getElementById('pwd01').value;
     const confirm    = document.getElementById('confirmInput').value;
 
-    // 3. Validate
-    let valid = true;
+    // 3. Validate using the shared helper
+    // First, gather the data into an object matching the helper's expectations
+    const d = {
+        fn01: firstname,
+        fn02: lastname,
+        number1: num01,
+        password01: pwd01,
+        email01: email01,
+        phone01: phone01,
+        quantity01: quantity01,
+        age: age,
+        guardian: guardianVal,
+        relstatus: relStatus,
+        spousename: spouse
+    };
 
-    if      (firstname === '')       { document.getElementById('firstErr').textContent    = 'Enter first name';              valid = false; }
-    else if (firstname.length < 3)   { document.getElementById('firstErr').textContent    = 'Min 3 characters required';     valid = false; }
+    const errors = getValidationErrors(d);
 
-    if      (lastname === '')        { document.getElementById('lastErr').textContent     = 'Enter last name';               valid = false; }
-    else if (lastname.length < 3)    { document.getElementById('lastErr').textContent     = 'Min 3 characters required';     valid = false; }
-
-    if (num01 === '' || isNaN(Number(num01)))              { document.getElementById('numErr').textContent      = 'Enter a valid number';            valid = false; }
-    if (pwd01.length < 8)                                  { document.getElementById('pwdErr').textContent      = 'Enter at least 8 characters';     valid = false; }
-    if (email01 === '' || !email01.includes('@') || !email01.includes('.')) { document.getElementById('emailErr').textContent = 'Enter a valid email'; valid = false; }
-    if (phone01 === '' || !phone01.match(/^\d{10}$/))      { document.getElementById('phoneErr').textContent    = 'Enter a valid 10 digit number';   valid = false; }
-    if (quantity01 === '' || isNaN(Number(quantity01)))    { document.getElementById('quantityErr').textContent = 'Enter a valid quantity';          valid = false; }
-
-    if      (age === '' || isNaN(Number(age))) { document.getElementById('ageErr').textContent = 'Enter a valid age';      valid = false; }
-    else if (age.length > 2)                   { document.getElementById('ageErr').textContent = 'Age must be 2 digits max'; valid = false; }
-
-    if (document.getElementById('guardianSection').style.display === 'block') {
-      if (guardianVal === '') { document.getElementById('guardianErr').textContent = 'Guardian name is required'; valid = false; }
+    // If there are errors, display them and stop
+    if (Object.keys(errors).length > 0) {
+        // Option: Show the first error in the msg paragraph
+        document.getElementById('msg').textContent = '❌ ' + Object.values(errors)[0];
+        document.getElementById('msg').style.color = 'red';
+        return;
     }
-
-    if (relStatus === '') { document.getElementById('relErr').textContent = 'Select a relationship status'; valid = false; }
-
-    if (document.getElementById('spouseSection').style.display === 'block') {
-      if (spouse === '') { document.getElementById('spouseErr').textContent = 'Spouse name is required'; valid = false; }
-    }
-
-    if (pass.length < 8)   { document.getElementById('strengthMsg').textContent = 'Password must be at least 8 characters'; valid = false; }
-    if (pass !== confirm)  { document.getElementById('matchMsg').textContent    = 'Passwords do not match';                  valid = false; }
-
-    // 4. Stop if any validation failed
-    if (!valid) return;
 
     const theForm = this;
 
@@ -197,6 +272,27 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(() => {
       document.getElementById('msg').textContent = '✅ Saved successfully!';
       theForm.reset();
+
+      // reset Live Input Counters and Error Messages
+
+      // Reset the counters and styles
+      const resetElements = [
+        { count: 'fnameCount', err: 'firstErr' },
+        { count: 'lnameCount', err: 'lastErr' },
+        { count: 'numCount', err: 'numErr' },
+        { count: 'quantityCount', err: 'quantityErr' },
+        { count: 'pwdCount', err: 'pwdErr' }
+      ];
+
+      resetElements.forEach(item => {
+        const counter = document.getElementById(item.count);
+        counter.textContent = '0 character' + (item.count === 'numCount' || item.count === 'quantityCount' ? ' digit' : 's entered');
+        counter.style.color = 'black'; // Reset to neutral color
+      });
+
+      document.getElementById('strengthMsg').textContent = '';
+      document.getElementById('matchMsg').textContent = '';
+
       document.getElementById('guardianSection').style.display = 'none';
       document.getElementById('spouseSection').style.display   = 'none';
       setTimeout(() => { document.getElementById('msg').textContent = ''; }, 3000);
@@ -213,22 +309,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ════════════════════════════════════════════
 // SECTION 3 — CRUD TABLE
-// Load, edit and delete rows from MySQL
 // ════════════════════════════════════════════
 
 function loadEntries() {
   fetch('/yentries')
     .then(res => res.json())
     .then(rows => {
-      // let html  = '<table border="1" cellpadding="6">';
-      // html += '<tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Numeric</th><th>Password</th><th>Email</th><th>Phone</th><th>Quantity</th><th>Age</th><th>Guardian</th><th>Rel Status</th><th>Spouse</th><th>Edit</th><th>Delete</th></tr>';
-      
-      // table table-striped table-hover = alternating rows + hover highlight
-      // table-responsive = horizontal scroll on mobile
       let html = '<div class="table-responsive"><table class="table table-striped table-hover align-middle">';
-      html += '<thead class="table-dark"><tr>';
-      html += '<th>ID</th><th>First Name</th><th>Last Name</th><th>Numeric</th><th>Password</th><th>Email</th><th>Phone</th><th>Quantity</th><th>Age</th><th>Guardian</th><th>Rel Status</th><th>Spouse</th><th>Edit</th><th>Delete</th>';
-      html += '</tr></thead><tbody>';
+      html += '<thead class="table-dark"><tr><th>ID</th><th>First Name</th><th>Last Name</th><th>ASIN</th><th>Password</th><th>Email Address</th><th>Phone Number</th><th>Quantity</th><th>Age</th><th>Guardian Information</th><th>Marital Status</th><th>Spouse Information</th><th>Edit</th><th>Delete</th></tr></thead><tbody>';
       
       rows.forEach(row => {
         html += `<tr>
@@ -244,69 +332,69 @@ function loadEntries() {
           <td>${row.guardian}</td>
           <td>${row.relstatus}</td>
           <td>${row.spousename}</td>
-          <td><button class="btn btn-sm btn-outline-primary me-1"
-          onclick="editRow(${row.id},'${row.firstname}','${row.lastname}','${row.ankval}','${row.inpass}','${row.email}','${row.phone}','${row.quantity}','${row.age}','${row.guardian}','${row.relstatus}','${row.spousename}')">Edit</button></td>
-          <td><button class="btn btn-sm btn-outline-danger"
-          onclick="deleteRow(${row.id})">Delete</button></td>
+          <td><button class="btn btn-sm btn-outline-primary me-1" onclick="editRow(${row.id},'${row.firstname}','${row.lastname}','${row.ankval}','${row.inpass}','${row.email}','${row.phone}','${row.quantity}','${row.age}','${row.guardian}','${row.relstatus}','${row.spousename}')">Edit</button></td>
+          <td><button class="btn btn-sm btn-outline-danger" onclick="deleteRow(${row.id})">Delete</button></td>
         </tr>`;
       });
-      // html += '</table>';
-      html += '</tbody></table></div>'
+      html += '</tbody></table></div>';
       document.getElementById('tableArea').innerHTML = html;
     });
 }
 
-function editRow(id, firstname, lastname, ankval, inpass, email, phone, quantity, age, guardian, relstatus, spousename) {
-  const newFirst     = prompt('New first name:', firstname);
-  const newLast      = prompt('New last name:', lastname);
-  const newNumeric   = prompt('New Numeric entry:', ankval);
-  const newPWD       = prompt('New Password Entry:', inpass);
-  const newEmail     = prompt('New Email:', email);
-  const newPhone     = prompt('New Phone:', phone);
-  const newQuantity  = prompt('New Quantity:', quantity);
-  // const newAge       = prompt('New Age:', age);
-  // const newGuardian  = prompt('New Guardian Name:', guardian);
-  // const newRelStatus = prompt('New Relationship Status:', relstatus);
-  // const newSpouse    = prompt('New Spouse Name:', spousename);
+// Outside of loadEntries
+async function editRow(id, firstname, lastname, ankval, inpass, email, phone, quantity, age, guardian, relstatus, spousename) {
+  
+// Changes to enforce the 2-digit rule
+  let rawNum = prompt('ASIN (2-digit):', ankval);
+  let newNumeric = (rawNum && rawNum.length > 2) ? rawNum.slice(0, 2) : rawNum;
 
-// Logic for Age/Guardian
-  let newAge = prompt('New Age:', age);
-  let newGuardian = '';
-  if (Number(newAge) < 18) {
-      newGuardian = prompt('New Guardian Name (Required for < 18):', guardian);
+  let rawQty = prompt('Quantity (2-digit):', quantity);
+  let newQuantity = (rawQty && rawQty.length > 2) ? rawQty.slice(0, 2) : rawQty;
+
+
+  let d = {
+    id,
+    fn01: prompt('First Name:', firstname),
+    fn02: prompt('Last Name:', lastname),
+    number1: newNumeric,
+    password01: prompt('Password:', inpass),
+    email01: prompt('Email Address:', email),
+    phone01: prompt('Phone Number:', phone),
+    quantity01: newQuantity,
+    age: prompt('Age (0-199):', age)
+  };
+
+
+  if (Object.values(d).includes(null)) return;
+
+  d.guardian = (Number(d.age) < 18) ? prompt('Guardian Name:', guardian) : '';
+  d.relstatus = prompt('Relationship (married/separated/unmarried):', relstatus);
+  d.spousename = (d.relstatus === 'married') ? prompt('Spouse Name:', spousename) : '';
+
+  const errors = getValidationErrors(d);
+  if (Object.keys(errors).length > 0) {
+    alert("Errors:\n" + Object.values(errors).join('\n'));
+    return;
   }
 
-  // Logic for Relationship/Spouse
-  let newRelStatus = prompt('New Relationship Status (married/separated/unmarried):', relstatus);
-  let newSpouse = '';
-  if (newRelStatus === 'married') {
-      newSpouse = prompt('New Spouse Name (Required for married):', spousename);
-  }
-
-  // If the user hits "Cancel" on any prompt, stop here
-  if ([newFirst, newLast, newNumeric, newPWD, newEmail, newPhone, newQuantity, newAge, newRelStatus].includes(null)) return;
-
-  // if ([newFirst, newLast, newNumeric, newPWD, newEmail, newPhone,
-  //      newQuantity, newAge, newGuardian, newRelStatus, newSpouse].includes(null)) return;
-
-  fetch('/yupdate', {
+  const res = await fetch('/yupdate', {
     method: 'POST',
-    body: new URLSearchParams({
-      id,
-      fn01: newFirst, fn02: newLast, number1: newNumeric,
-      password01: newPWD, email01: newEmail, phone01: newPhone,
-      quantity01: newQuantity, age: newAge, guardian: newGuardian,
-      relstatus: newRelStatus, spousename: newSpouse
-    })
-  })
-  .then(res => res.text())
-  .then(() => loadEntries());
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams(d)
+  });
+
+  if (res.ok) {
+    loadEntries();
+  } else {
+    alert("Server error, could not update.");
+  }
 }
 
 function deleteRow(id) {
   if (!confirm('Are you sure you want to delete this entry?')) return;
   fetch('/ydelete', {
     method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({ id })
   })
   .then(res => res.text())

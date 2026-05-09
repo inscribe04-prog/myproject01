@@ -31,15 +31,26 @@ app.use(session({
   // process.env.SESSION_SECRET reads from .env
   // No hardcoded string in code — safe to share
 
-  secret:            process.env.SESSION_SECRET,
+    secret:            process.env.SESSION_SECRET,
 
   // resave: false — don't save session if nothing changed
-  resave:            false,
+    resave:            false,
 
   // saveUninitialized: false — don't create session until
   // something is stored in it (i.e. until user logs in)
-  saveUninitialized: false
+    saveUninitialized: false
 }));
+
+// Middleware for Logging: A custom middleware in server.js that logs every request to the console with a timestamp. 
+// It’s the "Hello World" of Observability.
+
+
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
+
+
 
 // Serves login/index.htm, register.htm, and all /js, /css files publicly
 
@@ -57,7 +68,7 @@ app.use(express.static('public'));
 
 // ADD IT HERE
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/public/index.htm');
+    res.sendFile(__dirname + '/public/index.htm');
 });
 
 
@@ -67,7 +78,7 @@ app.get('/', (req, res) => {
 
 // ── requireLogin — defined here, used below ──
 function requireLogin(req, res, next) {
-  if (!req.session.user) {
+    if (!req.session.user) {
     res.redirect('/index.htm');
     return;
   }
@@ -86,14 +97,14 @@ app.get('/form.htm', requireLogin, (req, res) => {
   
   // __dirname = the folder where server.js lives
   // this sends the actual HTML file to the browser
-  res.sendFile(__dirname + '/views/form.htm');
+    res.sendFile(__dirname + '/views/form.htm');
 });
 
 // ── /me route — returns logged in user info ──
 
 // Add a /me route — returns current user's info as JSON
 app.get('/me', requireLogin, (req, res) => {
-  res.json(req.session.user);
+    res.json(req.session.user);
 });
 
 // ── Routes ──────────────────────────────────

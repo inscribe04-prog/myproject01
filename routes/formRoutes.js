@@ -25,6 +25,14 @@ router.post('/subbmmit', (req, res) => {
 
   console.log('FULL BODY:', req.body);
 
+  // Server-side check
+  if (!fn01 || fn01.length < 3) {
+    return res.status(400).send('Invalid First Name');
+  }
+  if (!email01 || !email01.includes('@')) {
+    return res.status(400).send('Invalid Email');
+  }
+
   const sql = `INSERT INTO form_entries
     (firstname, lastname, ankval, inpass, email, phone, quantity, age, guardian, relstatus, spousename)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
