@@ -7,9 +7,46 @@
 //   1. Live input listeners (counters, show/hide)
 //   2. Submit handler (validation + fetch)
 //   3. CRUD table (loadEntries, editRow, deleteRow)
+//   4. DOM Construction Refactor (renderTable)
 // ─────────────────────────────────────────────
 
 console.log("form.js loaded");
+
+//Global Variable
+
+let allEntries = []; // This holds our master list
+let currentPage = 1;
+const itemsPerPage = 3;
+let isTableVisible = false; // For the toggle feature
+
+// Global reference to the Bootstrap Modal
+// This tells JavaScript which database field goes into which Modal Input ID
+// This map links: Database Column Name -> Modal Input ID
+const fieldMap = {
+    'firstname':  'edit_fnaam',
+    'lastname':   'edit_lnaam',
+    'ankval':     'edit_num01',
+    'inpass':     'edit_pwd01',
+    'email':      'edit_email01',
+    'phone':      'edit_phone01',
+    'quantity':   'edit_quantity01',
+    'age':        'edit_ageInput',
+    'guardian':   'edit_guardianInput',
+    'relstatus':  'edit_relStatus',
+    'spousename': 'edit_spouseInput'
+};
+
+// Initialize the Bootstrap Modal
+const myModal = new bootstrap.Modal(document.getElementById('editModal'));
+
+
+
+// A simple function to escape HTML characters
+function escapeHtml(text) {
+  if (typeof text !== 'string') return text;
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+  return text.replace(/[&<>"']/g, (m) => map[m]);
+}
 
 
 
@@ -18,17 +55,17 @@ console.log("form.js loaded");
 // ════════════════════════════════════════════
 function getValidationErrors(d) {
   let err = {};
-  if (!d.fn01 || d.fn01.length < 3) err.fn01 = "First name min 3 chars";
-  if (!d.fn02 || d.fn02.length < 3) err.fn02 = "Last name min 3 chars";
+  if (!d.fn01 || d.fn01.length < 3) err.fn01 = "First Name should be minimum 3 chars";
+  if (!d.fn02 || d.fn02.length < 3) err.fn02 = "Last Name should be minimum 3 chars";
   if (isNaN(d.number1 ) || d.number1 < 0 || d.number1.length < 2)             err.number1 = "ASIN value is required and should be a 2-digit number";
-  if (d.password01.length < 8)      err.password01 = "Password min 8 chars";
-  if (!d.email01.includes('@'))     err.email = "Invalid email";
-  if (!/^\d{10}$/.test(d.phone01))  err.phone = "10 digit phone required";
-  if (isNaN(d.quantity01) || d.quantity01 < 0 || d.quantity01.length < 2)          err.qty = "Quantity must be a number";
-  if (d.age < 0 || d.age > 199)      err.age = "Enter valid age (0-199)";
+  if (d.password01.length < 8)      err.password01 = "Password should be minimum 8 chars";
+  if (!d.email01.includes('@'))     err.email = "Invalid email address!";
+  if (!/^\d{10,}$/.test(d.phone01))  err.phone = "Phone Number should be 10-digits or more";
+  if (isNaN(d.quantity01) || d.quantity01 < 0 || d.quantity01.length < 2)          err.qty = "Quantity must be a number and should be a 2-digit number";
+  if (d.age < 0 || d.age > 999)      err.age = "Enter a valid age (0-999)";
   
   // Logic checks
-  if (d.age < 18 && !d.guardian)    err.guardian = "Guardian name required for minors";
+  if (d.age < 18 && !d.guardian)    err.guardian = "Guardian name is required for minors";
   if (d.relstatus === 'married' && !d.spousename) err.spouse = "Spouse name required";
   
   return err;
@@ -36,17 +73,35 @@ function getValidationErrors(d) {
 
 
 
-// fetch current user info and show their name
+// Fetch current user info and show their name
   fetch('/me')
     .then(res => res.json())
     .then(user => {
       document.getElementById('welcomeMsg').textContent =
-        'Welcome, ' + user.firstname + '!';
+        'Welcome, ' + user.firstname + ' ' + user.lastname + '!';
     });
 
 
 
-document.getElementById('showTableBtn').addEventListener('click', loadEntries);
+document.getElementById('showTableBtn').addEventListener('click', function() {
+  const tableArea = document.getElementById('tableArea');
+  isTableVisible = !isTableVisible; // This flips true to false, or false to true
+
+  if (isTableVisible) {
+    this.textContent = "Hide Table";
+    tableArea.style.display = "block";
+    
+    // Only fetch if allEntries is empty to save data
+    if (allEntries.length === 0) {
+        loadEntries();
+    } else {
+        renderTable(allEntries); // Render existing data
+    }
+  } else {
+    this.textContent = "Show Table of Entries";
+    tableArea.style.display = "none";
+  }
+});
 
 // ════════════════════════════════════════════
 // SECTION 1 — LIVE INPUT LISTENERS
@@ -153,8 +208,10 @@ document.getElementById('pwd01').addEventListener('input', function() {
   else                  { msg.textContent = 'Strong'; msg.style.color = 'green';  }
 });
 
+
+
 // Confirm password match checker
-document.getElementById('confirmInput').addEventListener('input', function() {
+document.getElementById('confirmPasswordInput').addEventListener('input', function() {
   const pass    = document.getElementById('pwd01').value;
   const confirm = this.value;
   const msg     = document.getElementById('matchMsg');
@@ -205,7 +262,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.text-danger').forEach(el => el.textContent = '');
 
 
-
     // 2. Grab all values
     const firstname  = document.getElementById('fnaam').value.trim();
     const lastname   = document.getElementById('lnaam').value.trim();
@@ -219,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const relStatus  = document.getElementById('relStatus').value;
     const spouse     = document.getElementById('spouseInput').value.trim();
     const pass       = document.getElementById('pwd01').value;
-    const confirm    = document.getElementById('confirmInput').value;
+    const confirm    = document.getElementById('confirmPasswordInput').value;
 
     // 3. Validate using the shared helper
     // First, gather the data into an object matching the helper's expectations
@@ -239,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const errors = getValidationErrors(d);
 
-    // If there are errors, display them and stop
+    // 4. If there are errors, display them and stop
     if (Object.keys(errors).length > 0) {
         // Option: Show the first error in the msg paragraph
         document.getElementById('msg').textContent = '❌ ' + Object.values(errors)[0];
@@ -250,6 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const theForm = this;
 
     // 5. Send data to server
+    // C of CRUD = CREATE → POST request to /submit
 
     fetch('/subbmmit', {
       method:  'POST',
@@ -273,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('msg').textContent = '✅ Saved successfully!';
       theForm.reset();
 
-      // reset Live Input Counters and Error Messages
+      // 6. Reset Live Input Counters and Error Messages
 
       // Reset the counters and styles
       const resetElements = [
@@ -308,88 +365,244 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // ════════════════════════════════════════════
-// SECTION 3 — CRUD TABLE
+// SECTION 3 — Remaining CRUD TABLE
 // ════════════════════════════════════════════
+// R of CRUD = READ → GET request to /yentries to load all entries and show in a table
 
-function loadEntries() {
-  fetch('/yentries')
-    .then(res => res.json())
-    .then(rows => {
-      let html = '<div class="table-responsive"><table class="table table-striped table-hover align-middle">';
-      html += '<thead class="table-dark"><tr><th>ID</th><th>First Name</th><th>Last Name</th><th>ASIN</th><th>Password</th><th>Email Address</th><th>Phone Number</th><th>Quantity</th><th>Age</th><th>Guardian Information</th><th>Marital Status</th><th>Spouse Information</th><th>Edit</th><th>Delete</th></tr></thead><tbody>';
-      
-      rows.forEach(row => {
-        html += `<tr>
-          <td>${row.id}</td>
-          <td>${row.firstname}</td>
-          <td>${row.lastname}</td>
-          <td>${row.ankval}</td>
-          <td>${row.inpass}</td>
-          <td>${row.email}</td>
-          <td>${row.phone}</td>
-          <td>${row.quantity}</td>
-          <td>${row.age}</td>
-          <td>${row.guardian}</td>
-          <td>${row.relstatus}</td>
-          <td>${row.spousename}</td>
-          <td><button class="btn btn-sm btn-outline-primary me-1" onclick="editRow(${row.id},'${row.firstname}','${row.lastname}','${row.ankval}','${row.inpass}','${row.email}','${row.phone}','${row.quantity}','${row.age}','${row.guardian}','${row.relstatus}','${row.spousename}')">Edit</button></td>
-          <td><button class="btn btn-sm btn-outline-danger" onclick="deleteRow(${row.id})">Delete</button></td>
-        </tr>`;
-      });
-      html += '</tbody></table></div>';
-      document.getElementById('tableArea').innerHTML = html;
-    });
+
+async function loadEntries() {
+
+    const tableArea = document.getElementById('tableArea');
+     tableArea.innerHTML = '<div class="spinner-border text-primary" role="status"></div>';
+
+    try {
+        // "Await" tells the code: wait for the server to reply before moving on
+        const response = await fetch('/yentries');
+        
+        // If the server returns a status like 404 or 500, throw an error
+        if (!response.ok) throw new Error('Failed to fetch entries Server returned an error: ' + response.status);
+
+        const rows = await response.json();
+        
+        allEntries = rows; 
+        renderTable(rows); 
+        
+    } catch (err) {
+        console.error("Fetch Error Critical Error loading entries:", err);
+        tableArea.innerHTML = `<div class="alert alert-danger">Failed to load data. Please try again.</div>`;
+    }
 }
 
-// Outside of loadEntries
-async function editRow(id, firstname, lastname, ankval, inpass, email, phone, quantity, age, guardian, relstatus, spousename) {
+
+
+// A helper to make table cells quickly
+function createCell(text) {
+    const td = document.createElement('td');
+    td.textContent = text; // .textContent is the "Pro" way. It auto-sanitizes input!
+    return td;
+}
+
+
+// This function takes an array of rows and renders the HTML table
+function renderTable(rows) {
+
+  // 1. Calculate Start and End index for the current page
+  const start = (currentPage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const paginatedRows = rows.slice(start, end);
+  const totalPages = Math.ceil(rows.length / itemsPerPage);
+
+
+  const tableArea = document.getElementById('tableArea');
+        tableArea.innerHTML = ''; // Clear previous table
+
+  // 2. Create the table structure
+    const table = document.createElement('table');
+    table.className = 'table table-striped table-hover align-middle';
+
+    // Add header manually
+    table.innerHTML = `
+    <thead class="table-light">
+        <tr><th>ID</th><th>First Name</th><th>Last Name</th><th>ASIN</th><th>Password</th><th>Email Address</th><th>Phone Number</th><th>Quantity</th><th>Age</th><th>Guardian Information</th><th>Marital Status</th><th>Spouse Information</th></tr>
+        </thead>
+        <tbody></tbody>`;
+    
+    const tbody = table.querySelector('tbody');
   
-// Changes to enforce the 2-digit rule
-  let rawNum = prompt('ASIN (2-digit):', ankval);
-  let newNumeric = (rawNum && rawNum.length > 2) ? rawNum.slice(0, 2) : rawNum;
+// 3. Loop through the paginated rows and add them to the table body
 
-  let rawQty = prompt('Quantity (2-digit):', quantity);
-  let newQuantity = (rawQty && rawQty.length > 2) ? rawQty.slice(0, 2) : rawQty;
+      paginatedRows.forEach(row => {
+        const tr = document.createElement('tr');
+
+          tr.appendChild(createCell(row.id));
+          tr.appendChild(createCell(row.firstname));
+          tr.appendChild(createCell(row.lastname));
+          tr.appendChild(createCell(row.ankval));
+          tr.appendChild(createCell(row.inpass));
+          tr.appendChild(createCell(row.email));
+          tr.appendChild(createCell(row.phone));
+          tr.appendChild(createCell(row.quantity));
+          tr.appendChild(createCell(row.age));
+          tr.appendChild(createCell(row.guardian));
+          tr.appendChild(createCell(row.relstatus));
+          tr.appendChild(createCell(row.spousename));
+
+          // Actions Cell (Edit/Delete buttons)
+        const actionTd = document.createElement('td');
+        const editBtn = document.createElement('button');
+          editBtn.className = 'btn btn-sm btn-outline-primary me-1';
+          editBtn.textContent = 'Edit';
+
+          editBtn.onclick = () => editRow(row.id, row.firstname, row.lastname, row.ankval, row.inpass, row.email, row.phone, row.quantity, row.age, row.guardian, row.relstatus, row.spousename);
+
+        const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'btn btn-sm btn-outline-danger';
+          deleteBtn.textContent = 'Delete';
+          deleteBtn.onclick = () => deleteRow(row.id);
+
+        actionTd.appendChild(editBtn);
+        actionTd.appendChild(deleteBtn);
+          tr.appendChild(actionTd);
+        
+    tbody.appendChild(tr);
+    });
 
 
-  let d = {
-    id,
-    fn01: prompt('First Name:', firstname),
-    fn02: prompt('Last Name:', lastname),
-    number1: newNumeric,
-    password01: prompt('Password:', inpass),
-    email01: prompt('Email Address:', email),
-    phone01: prompt('Phone Number:', phone),
-    quantity01: newQuantity,
-    age: prompt('Age (0-199):', age)
-  };
+    tableArea.appendChild(table);
+
+// 3. Add Pagination Controls below the table
+
+      const nav = document.createElement('nav');
+        nav.setAttribute('aria-label', 'Page navigation');
+        nav.className = 'mt-3';
+
+        const ul = document.createElement('ul');
+        ul.className = 'pagination justify-content-center';
+
+// Helper to create page buttons
+      const createPageBtn = (label, direction, disabled) => {
+      const li = document.createElement('li');
+            li.className = `page-item ${disabled ? 'disabled' : ''}`;
+            
+            const btn = document.createElement('button');
+            btn.className = 'page-link';
+            btn.textContent = label;
+            
+// The Professional Way: Use addEventListener instead of onclick
+            if (!disabled) {
+                btn.addEventListener('click', () => changePage(direction));
+            }
+            
+            li.appendChild(btn);
+            return li;
+        };
+
+// Add Previous
+        ul.appendChild(createPageBtn('Previous', -1, currentPage === 1));
+
+// Add Page Info
+      const infoLi = document.createElement('li');
+        infoLi.className = 'page-item disabled';
+        infoLi.innerHTML = `<span class="page-link">Page ${currentPage} of ${totalPages || 1}</span>`;
+        ul.appendChild(infoLi);
+
+        // Add Next
+        ul.appendChild(createPageBtn('Next', 1, currentPage >= totalPages));
+
+        nav.appendChild(ul);
+        tableArea.appendChild(nav);
+      }
 
 
-  if (Object.values(d).includes(null)) return;
+// Search functionality
+      document.getElementById('searchInput').addEventListener('input', function(e) {
+        const searchterm = e.target.value.toLowerCase();
+        // Filter the master list
+        const filteredcontents = allEntries.filter(row => 
+          row.firstname.toLowerCase().includes(searchterm) || 
+          row.lastname.toLowerCase().includes(searchterm)
+        );
+        renderTable(filteredcontents); // Re-draw with subset
+      });
 
-  d.guardian = (Number(d.age) < 18) ? prompt('Guardian Name:', guardian) : '';
-  d.relstatus = prompt('Relationship (married/separated/unmarried):', relstatus);
-  d.spousename = (d.relstatus === 'married') ? prompt('Spouse Name:', spousename) : '';
 
-  const errors = getValidationErrors(d);
-  if (Object.keys(errors).length > 0) {
-    alert("Errors:\n" + Object.values(errors).join('\n'));
-    return;
-  }
 
-  const res = await fetch('/yupdate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams(d)
-  });
+// 1. Modal conditional logic (Listen for changes inside the Modal)
+document.getElementById('edit_ageInput').addEventListener('input', function() {
+    const age = Number(this.value);
+    document.getElementById('edit_guardianSection').style.display = (age > 0 && age < 18) ? 'block' : 'none';
+});
 
-  if (res.ok) {
-    loadEntries();
-  } else {
-    alert("Server error, could not update.");
-  }
+document.getElementById('edit_relStatus').addEventListener('change', function() {
+    document.getElementById('edit_spouseSection').style.display = (this.value === 'married') ? 'block' : 'none';
+});
+
+
+// 2. The Updated editRow
+function editRow(id, firstname, lastname, ankval, inpass, email, phone, quantity, age, guardian, relstatus, spousename) {
+    const data = { firstname, lastname, ankval, inpass, email, phone, quantity, age, guardian, relstatus, spousename };
+
+    Object.keys(fieldMap).forEach(key => {
+        const inputId = fieldMap[key];
+        const inputEl = document.getElementById(inputId);
+        if (inputEl) inputEl.value = data[key];
+    });
+
+    document.getElementById('editId').value = id;
+
+    // Custom Logic
+    document.getElementById('edit_guardianSection').style.display = (Number(age) < 18) ? 'block' : 'none';
+    document.getElementById('edit_spouseSection').style.display = (relstatus === 'married') ? 'block' : 'none';
+
+    myModal.show();
 }
 
+// 3. Save Handler
+document.getElementById('saveEditBtn').addEventListener('click', async () => {
+    // Grab values from the modal IDs
+    const d = {
+        id: document.getElementById('editId').value,
+        fn01: document.getElementById('edit_fnaam').value,
+        fn02: document.getElementById('edit_lnaam').value,
+        number1: document.getElementById('edit_num01').value,
+        password01: document.getElementById('edit_pwd01').value,
+        email01: document.getElementById('edit_email01').value,
+        phone01: document.getElementById('edit_phone01').value,
+        quantity01: document.getElementById('edit_quantity01').value,
+        age: document.getElementById('edit_ageInput').value,
+        guardian: document.getElementById('edit_guardianInput').value,
+        relstatus: document.getElementById('edit_relStatus').value,
+        spousename: document.getElementById('edit_spouseInput').value
+    };
+
+    // Validate
+    const errors = getValidationErrors(d);
+    if (Object.keys(errors).length > 0) {
+        alert("Errors:\n" + Object.values(errors).join('\n'));
+        return; 
+    }
+
+    // Send to Server
+    try {
+        const res = await fetch('/yupdate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(d)
+        });
+
+        if (res.ok) {
+            myModal.hide();
+            alert("Updated successfully!");
+            loadEntries();
+        } else {
+            alert("Server error, could not update.");
+        }
+    } catch (err) {
+        console.error("Save error:", err);
+    }
+});
+
+// D of CRUD = DELETE
 function deleteRow(id) {
   if (!confirm('Are you sure you want to delete this entry?')) return;
   fetch('/ydelete', {
@@ -401,5 +614,14 @@ function deleteRow(id) {
   .then(() => loadEntries());
 }
 
-// Load table on page open
-// loadEntries();
+// Pagination
+function changePage(direction) {
+  currentPage += direction;
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = allEntries.filter(row => 
+    row.firstname.toLowerCase().includes(searchTerm) || 
+    row.lastname.toLowerCase().includes(searchTerm)
+  );
+  renderTable(filtered);
+}
+
