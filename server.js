@@ -22,6 +22,10 @@ const app     = express();
 // Parses incoming form data (urlencoded bodies)
 app.use(express.urlencoded({ extended: true }));
 
+// ADD THIS: Parses incoming JSON data (Crucial for modern APIs)
+app.use(express.json()); 
+
+
 // add this AFTER app.use(express.urlencoded) in server.js
 // this registers session middleware — must be before any routes
 app.use(session({
@@ -122,6 +126,50 @@ app.use('/', formRoutes);
 
 const PORT = Number(process.env.PORT) || 3000;
 app.listen(PORT, () => console.log('Server running on http://localhost:' + PORT));
+
+
+const rateLimit = require('express-rate-limit');
+
+// 1. Create a Login/Register Limiter
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // Block after 5 attempts
+    message: { error: "Too many attempts, try again later." }
+});
+
+// 2. Apply it
+app.use('/login', authLimiter);
+app.use('/register', authLimiter);
+
+// 3. Secure Session Cookie
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,    // Prevents JS from reading cookies (XSS Protection)
+        secure: process.env.NODE_ENV === 'production', // Use HTTPS only in production
+        sameSite: 'strict', // CSRF Protection
+        maxAge: 3600000 // 1 hour
+    }
+}));
+
+// 2. Apply it
+app.use('/login', authLimiter);
+app.use('/register', authLimiter);
+
+// 3. Secure Session Cookie
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,    // Prevents JS from reading cookies (XSS Protection)
+        secure: process.env.NODE_ENV === 'production', // Use HTTPS only in production
+        sameSite: 'strict', // CSRF Protection
+        maxAge: 3600000 // 1 hour
+    }
+}));
 
 
   

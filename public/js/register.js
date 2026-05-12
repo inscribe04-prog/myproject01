@@ -15,24 +15,44 @@ console.log("register.js loaded");
 
 document.addEventListener('DOMContentLoaded', () => {
 
+const regPass = document.getElementById('regPass');
+const regMsg = document.getElementById('regMsg');
+
+regPass.addEventListener('input', function() {
+    const error = utils.validatePassword(this.value);
+    if (error) {
+        regMsg.textContent = error;
+        regMsg.classList.remove('d-none');
+        regMsg.classList.add('alert-warning');
+    } else {
+        regMsg.textContent = "Password looks good!";
+        regMsg.classList.remove('alert-warning');
+        regMsg.classList.add('alert-success');
+    }
+});
+
 document.getElementById('regForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
       // 1. Clear all old error messages
       const regMsg    = document.getElementById('regMsg').textContent = '';
 
-      // 2. Grab all four values
+      // 2. Grab all required values
       const firstname = document.getElementById('regFirst').value.trim();
       const lastname  = document.getElementById('regLast').value.trim();
       const email     = document.getElementById('regEmail').value.trim();
       const password  = document.getElementById('regPass').value;
+      const msg = document.getElementById('regMsg');
 
-      // 3. Basic validation before sending
-      if (!firstname || !lastname || !email || password.length < 8) {
-        document.getElementById('regMsg').textContent = 'Please fill all fields correctly';
-        return;
+      // 1. Validate
+      const emailErr = utils.validateAuthInput(email, 'email');
+      const passErr  = utils.validatePassword(password);
+
+      // 2. Show Error if needed
+      if (emailErr || passErr) {
+          utils.showError('regMsg', emailErr || passErr);
+          return;
       }
-
       // send to /register route in server.js
       fetch('/register', {
         method: 'POST',
@@ -47,7 +67,7 @@ document.getElementById('regForm').addEventListener('submit', function(e) {
         } else {
           // document.getElementById('regMsg').textContent = data.error;
           const msg = document.getElementById('regMsg');
-                      msg.textContent = 'Please fill all fields correctly';
+                      msg.textContent = 'Please fill all fields correctly'+ data.error;
                       msg.classList.remove('d-none');
         }
       });

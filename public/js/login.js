@@ -8,6 +8,7 @@
 console.log("login.js loaded");  
 
 
+
 // ════════════════════════════════════════════
 // SECTION 2 — SUBMIT HANDLER
 // Validates all fields then sends via fetch
@@ -15,6 +16,22 @@ console.log("login.js loaded");
 
 
 document.addEventListener('DOMContentLoaded', () => {
+
+const loginEmail = document.getElementById('loginEmail');
+const loginMsg = document.getElementById('loginMsg');
+
+loginEmail.addEventListener('input', function() {
+    // Only show error if the user has typed enough for an email
+    if (this.value.length > 5) {
+        const error = utils.validateAuthInput(this.value, 'email');
+        if (error) {
+            loginMsg.textContent = error;
+            loginMsg.classList.remove('d-none');
+        } else {
+            loginMsg.classList.add('d-none');
+        }
+    }
+});
 
 document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -24,14 +41,21 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
       // 1. Clear all old error messages
       const loginMsg = document.getElementById('loginMsg').textContent = '';
     
-      // 2. Grab all four values
+      // 2. Grab all required values
       const email    = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPass').value;
 
-      // 3. Basic validation before sending
-      if (email === '' || password.length === 0) {
-        document.getElementById('loginMsg').textContent = 'Please fill the login credentials';
-        return;
+      // 1. Validate (Login usually doesn't need strict password rules to avoid revealing info)
+      const emailErr = utils.validateAuthInput(email, 'email');
+
+      if (!email || !password) {
+          utils.showError('loginMsg', 'Please fill in all fields.');
+          return;
+      }
+
+      if (emailErr) {
+          utils.showError('loginMsg', emailErr);
+          return;
       }
       
       // send to /login route in server.js

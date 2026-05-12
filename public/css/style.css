@@ -1,0 +1,10 @@
+/* public/css/style.css */
+.hidden {
+    display: none !important;
+}
+
+/* Optional: Group your error styling */
+.error-msg {
+    color: #dc3545; /* Bootstrap text-danger color */
+    font-size: 0.875em;
+}

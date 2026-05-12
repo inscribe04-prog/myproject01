@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/style.css">
   <title>HTML Forms</title>
   <!-- <link rel="stylesheet" href="/css/form.css"> -->
 
@@ -89,7 +90,7 @@
             <label class="form-label">Enter ASIN</label>
             <input type="number" id="num01" name="number1" placeholder="ASIN 2-digit number (0-99)" class="form-control">
             <span id="numCount">0 digit</span>
-            <p><span id="numErr" class="text-muted small" style="font-style: italic;">ASIN is a 2-digit number.</span></p>
+            <p><span id="numErr" class="text-muted small" style="font-style: italic;">ASIN is a positive2-digit number.</span></p>
         </div>
 
 
@@ -139,7 +140,7 @@
           <label for="quantity01" class="form-label">Enter Quantity</label>
           <input type="number" id="quantity01" name="quantity01" placeholder="Quantity (0-99)" class="form-control">
           <span id="quantityCount">0 digit</span>
-          <p><span id="quantityErr" class="text-muted small" style="font-style: italic;">Quantity is a 2-digit number.</span></p>
+          <p><span id="quantityErr" class="text-muted small" style="font-style: italic;">Quantity is a positive 2-digit number.</span></p>
         </div>
 
         <!-- Two columns side by side for Age + Guardian -->
@@ -149,8 +150,8 @@
             <input type="number" id="ageInput" name="age" placeholder="Age (0-999)" class="form-control">
             <span id="ageErr" class="text-danger small"></span>
           </div>
-          <div class="col-md-6" id="guardianSection" style="display:none" class= "form-label">
-            <label>Guardian Name (required if under 18)</label>
+          <div class="col-md-6 hidden" id="guardianSection" class= "form-label">
+            <label class="form-label">Guardian Name (required if under 18)</label>
             <input type="text" id="guardianInput" name="guardian" placeholder="Guardian Name" class="form-control">
             <span id="guardianErr" class="text-danger small"></span>
           </div>
@@ -171,8 +172,8 @@
             </select>
             <span id="relErr" class="text-danger small"></span>
           </div>
-          <div class="col-md-6" id="spouseSection" style="display:none" class="form-label">
-            <label for="spouseInput">Spouse Name (required if married)</label>
+          <div class="col-md-6 hidden" id="spouseSection" class="form-label">
+            <label for="spouseInput" class="form-label">Spouse Name (required if married)</label>
             <input type="text" id="spouseInput" name="spousename" placeholder="Spouse Name" class="form-control">
             <span id="spouseErr" class="text-danger small"></span>
           </div>
@@ -279,12 +280,12 @@
       <input type="text" class="form-control" id="edit_spouseInput" placeholder="Spouse Name">
     </div>
   </div>
-  <div class="mb-3" id="edit_guardianSection" style="display:none;">
+  <div class= "col-md-6 hidden" id="edit_guardianSection">
     <label>Guardian Name (required if under 18)</label>
     <input type="text" class="form-control" id="edit_guardianInput">
   </div>
 
-  <div class="mb-3" id="edit_spouseSection" style="display:none;">
+  <div class="col-md-6 hidden" id="edit_spouseSection">
     <label>Spouse Name (required if married)</label>
     <input type="text" class="form-control" id="edit_spouseInput">
   </div>
@@ -300,6 +301,7 @@
 
 
 
+<script src="/js/utils.js"></script>
 
 <!-- Bootstrap JS — paste before closing </body> -->
 <!-- Needed for navbar toggle, dropdowns, modals -->
