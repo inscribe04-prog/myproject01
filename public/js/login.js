@@ -33,6 +33,16 @@ loginEmail.addEventListener('input', function() {
     }
 });
 
+// Live validation on Email
+    loginEmail.addEventListener('blur', function() {
+        const err = utils.validateAuthInput(this.value.trim(), 'email');
+        if (err) {
+            utils.showError('loginMsg', err);
+        } else {
+            loginMsg.classList.add('d-none'); // Clear if valid
+        }
+    });
+
 document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
     //   const email    = document.getElementById('loginEmail').value.trim();

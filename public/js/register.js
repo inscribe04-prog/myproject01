@@ -14,7 +14,8 @@ console.log("register.js loaded");
 // ════════════════════════════════════════════
 
 document.addEventListener('DOMContentLoaded', () => {
-
+    
+const regEmail = document.getElementById('regEmail');
 const regPass = document.getElementById('regPass');
 const regMsg = document.getElementById('regMsg');
 
@@ -30,6 +31,19 @@ regPass.addEventListener('input', function() {
         regMsg.classList.add('alert-success');
     }
 });
+
+// Live validation on Email
+    regEmail.addEventListener('blur', function() {
+        const err = utils.validateAuthInput(this.value.trim(), 'email');
+        utils.showError('regMsg', err);
+    });
+
+    // Live validation on Password
+    regPass.addEventListener('blur', function() {
+        const err = utils.validatePassword(this.value);
+        utils.showError('regMsg', err);
+    });
+
 
 document.getElementById('regForm').addEventListener('submit', function(e) {
       e.preventDefault();

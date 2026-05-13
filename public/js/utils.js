@@ -22,8 +22,13 @@ window.utils = {
     showError: function(msgElementId, message, isError = true) {
         const el = document.getElementById(msgElementId);
         if (!el) return;
-        el.textContent = message || '';
-        el.style.display = message ? 'block' : 'none';
-        el.className = isError ? 'alert alert-danger' : 'alert alert-success';
+        if (message) {
+            el.textContent = message;
+            el.classList.remove('d-none');
+            el.className = isError ? 'alert alert-danger' : 'alert alert-success';
+        } else {
+            el.textContent = '';
+            el.classList.add('d-none');
+        }
     }
 };
