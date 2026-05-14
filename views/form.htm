@@ -74,13 +74,13 @@
         <div class="row mb-3">
           <div class="col-md-6">
             <label class="form-label">Enter First Name</label>
-            <input type="text" id="fnaam" name="fn01" class="form-control" placeholder="First Name">
+            <input type="text" id="main_firstname" name="fn01" class="form-control" placeholder="First Name">
             <span id="firstErr" class="text-danger small"></span>
             <span id="fnameCount">0 character</span>
           </div>
           <div class="col-md-6">
             <label class="form-label">Enter Last Name</label>
-            <input type="text" id="lnaam" name="fn02" class="form-control" placeholder="Last Name">
+            <input type="text" id="main_lastname" name="fn02" class="form-control" placeholder="Last Name">
             <span id="lastErr" class="text-muted small"></span>
             <span id="lnameCount">0 character</span>
           </div>
@@ -88,7 +88,7 @@
 
         <div class="mb-3">     
             <label class="form-label">Enter ASIN</label>
-            <input type="number" id="num01" name="number1" placeholder="ASIN 2-digit number (0-99)" class="form-control">
+            <input type="number" id="main_asin" name="number1" placeholder="ASIN 2-digit number (0-99)" class="form-control">
             <span id="numCount">0 digit</span>
             <p><span id="numErr" class="text-muted small" style="font-style: italic;">ASIN is a positive2-digit number.</span></p>
         </div>
@@ -100,7 +100,7 @@
         <div class="row mb-3">
           <div class="col-md-6">
             <label class="form-label">Password</label>
-            <input type="password" id="pwd01" name="password01" class="form-control" placeholder="Password">
+            <input type="password" id="main_inpass" name="password01" class="form-control" placeholder="Password">
             <span id="pwdErr" class="text-danger small"></span>
             <span id="strengthMsg" class="small fw-bold"></span>
             <span id="pwdCount">0 character</span>
@@ -113,7 +113,7 @@
           
           <div class="col-md-6">
             <label class="form-label">Confirm Password</label>
-            <input type="password" id="confirmPasswordInput" placeholder="Confirm Password" class="form-control">
+            <input type="password" id="main_confirminpass" placeholder="Confirm Password" class="form-control">
             <span id="matchMsg" class="text-danger small"></span>
           </div>
         </div>
@@ -124,13 +124,14 @@
         <div class="row mb-3">
           <div class="col-md-6">
             <label for="email01" class="form-label">Enter Email Address</label>
-            <input type="email" id="email01" name="email01" placeholder="Email address" class="form-control">
+            <input type="email" id="main_email" name="email01" placeholder="Email address" class="form-control">
             <span id="emailErr" class="text-muted small"></span>
           </div>
 
           <div class="col-md-6">
             <label for="phone01" class="form-label">Enter Phone Number</label>
-            <input type="tel" id="phone01" name="phone01" placeholder="Phone Number 10-digits" class="form-control">
+            <input type="tel" id="main_phone" name="phone01" placeholder="Phone Number 10-digits" class="form-control">
+            <small id="phoneCounter" class="counter"></small>
             <span id="phoneErr" class="text-muted small"></span>
           </div>
         </div>
@@ -138,7 +139,7 @@
         
         <div class="mb-3">
           <label for="quantity01" class="form-label">Enter Quantity</label>
-          <input type="number" id="quantity01" name="quantity01" placeholder="Quantity (0-99)" class="form-control">
+          <input type="number" id="main_quantity" name="quantity01" placeholder="Quantity (0-99)" class="form-control">
           <span id="quantityCount">0 digit</span>
           <p><span id="quantityErr" class="text-muted small" style="font-style: italic;">Quantity is a positive 2-digit number.</span></p>
         </div>
@@ -147,12 +148,12 @@
         <div class="row mb-3">
           <div class="col-md-6">
             <label for="ageInput" class="form-label">Enter Your Age (years) implements conditional logic</label>
-            <input type="number" id="ageInput" name="age" placeholder="Age (0-999)" class="form-control">
+            <input type="number" id="main_age" name="age" placeholder="Age (0-999)" class="form-control">
             <span id="ageErr" class="text-danger small"></span>
           </div>
-          <div class="col-md-6 hidden" id="guardianSection" class= "form-label">
+          <div class="col-md-6 hidden" id="main_guardiansection" class= "form-label">
             <label class="form-label">Guardian Name (required if under 18)</label>
-            <input type="text" id="guardianInput" name="guardian" placeholder="Guardian Name" class="form-control">
+            <input type="text" id="main_guardian" name="guardian" placeholder="Guardian Name" class="form-control">
             <span id="guardianErr" class="text-danger small"></span>
           </div>
         </div>
@@ -164,7 +165,7 @@
           <div class="col-md-6">
             <label class="form-label">Marital Status</label>
             <!-- form-select = Bootstrap styled dropdown -->
-            <select id="relStatus" name="relstatus" class="form-select" aria-placeholder="Select Status">
+            <select id="main_relstatus" name="relstatus" class="form-select" aria-placeholder="Select Status">
             <option value="notdisclose">Not Disclosing</option>
             <option value="unmarried">Unmarried</option>
             <option value="married">Married</option>
@@ -172,9 +173,9 @@
             </select>
             <span id="relErr" class="text-danger small"></span>
           </div>
-          <div class="col-md-6 hidden" id="spouseSection" class="form-label">
+          <div class="col-md-6 hidden" id="main_spousesection" class="form-label">
             <label for="spouseInput" class="form-label">Spouse Name (required if married)</label>
-            <input type="text" id="spouseInput" name="spousename" placeholder="Spouse Name" class="form-control">
+            <input type="text" id="main_spousename" name="spousename" placeholder="Spouse Name" class="form-control">
             <span id="spouseErr" class="text-danger small"></span>
           </div>
         </div>
@@ -195,10 +196,10 @@
   <h5>Form entries from database:</h5>
   <p>Click on the button below to view them</p>
   <div class="mb-4">
-  <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search entries by name...">
+  <input type="text" id="main_search" class="form-control" placeholder="🔍 Search entries by name...">
   </div>
-  <button type="button" class="btn btn-outline-warning w-100 mt-2" id="showTableBtn">Show Table of Entries</button>
-  <button type="button" class="btn btn-outline-info w-100 mt-2" id="exportBtn">Export to CSV</button>
+  <button type="button" class="btn btn-outline-warning w-100 mt-2" id="main_showTableBtn">Show Table of Entries</button>
+  <button type="button" class="btn btn-outline-info w-100 mt-2" id="main_exportBtn">Export to CSV</button>
   <div id="tableArea"></div>
   
 
@@ -220,56 +221,56 @@
   <div class="row">
     <div class="col-md-6 mb-3">
       <label class="form-label">First Name</label>
-      <input type="text" class="form-control" id="edit_fnaam" placeholder="First Name">
+      <input type="text" class="form-control" id="edit_firstname" placeholder="First Name">
     </div>
     <div class="col-md-6 mb-3">
       <label class="form-label">Last Name</label>
-      <input type="text" class="form-control" id="edit_lnaam" placeholder="Last Name">
+      <input type="text" class="form-control" id="edit_lastname" placeholder="Last Name">
     </div>
   </div>
 
   <div class="mb-3">
     <label class="form-label">ASIN</label>
-    <input type="number" class="form-control" id="edit_num01" placeholder="ASIN 2-digit number">
+    <input type="number" class="form-control" id="edit_asin" placeholder="ASIN 2-digit number">
   </div>
 
   <div class="row">
     <div class="col-md-6 mb-3">
       <label class="form-label">Password</label>
-      <input type="password" class="form-control" id="edit_pwd01" placeholder="Password">
+      <input type="password" class="form-control" id="edit_inpass" placeholder="Password">
     </div>
     <div class="col-md-6 mb-3">
       <label class="form-label">Email</label>
-      <input type="email" class="form-control" id="edit_email01" placeholder="Email address">
+      <input type="email" class="form-control" id="edit_email" placeholder="Email address">
     </div>
   </div>
 
   <div class="row">
     <div class="col-md-6 mb-3">
       <label class="form-label">Phone</label>
-      <input type="tel" class="form-control" id="edit_phone01" placeholder="Phone Number">
+      <input type="tel" class="form-control" id="edit_phone" placeholder="Phone Number">
     </div>
     <div class="col-md-6 mb-3">
       <label class="form-label">Quantity</label>
-      <input type="number" class="form-control" id="edit_quantity01" placeholder="Quantity">
+      <input type="number" class="form-control" id="edit_quantity" placeholder="Quantity">
     </div>
   </div>
 
   <div class="row">
     <div class="col-md-6 mb-3">
       <label class="form-label">Age</label>
-      <input type="number" class="form-control" id="edit_ageInput" placeholder="Age (0-999)">
+      <input type="number" class="form-control" id="edit_age" placeholder="Age (0-999)">
     </div>
-    <div class="col-md-6 mb-3 hidden" id="edit_guardianSection">
+    <div class="col-md-6 mb-3 hidden" id="edit_guardiansection">
       <label class="form-label">Guardian Name (required if < 18)</label>
-      <input type="text" class="form-control" id="edit_guardianInput" placeholder="Guardian Name">
+      <input type="text" class="form-control" id="edit_guardian" placeholder="Guardian Name">
     </div>
   </div>
 
   <div class="row">
     <div class="col-md-6 mb-3">
       <label class="form-label">Marital Status</label>
-      <select class="form-select" id="edit_relStatus">
+      <select class="form-select" id="edit_relstatus">
         <option value="notdisclose">Not Disclosing</option>
         <option value="unmarried">Unmarried</option>
         <option value="married">Married</option>
@@ -277,9 +278,9 @@
       </select>
     </div>
 
-    <div class="col-md-6 mb-3 hidden" id="edit_spouseSection">
+    <div class="col-md-6 mb-3 hidden" id="edit_spousesection">
       <label class="form-label">Spouse Name</label>
-      <input type="text" class="form-control" id="edit_spouseInput" placeholder="Spouse Name">
+      <input type="text" class="form-control" id="edit_spousename" placeholder="Spouse Name">
     </div>
   </div>
   </form>
@@ -294,6 +295,8 @@
 
 
 
+
+<script src="/js/schema.js"></script>
 <script src="/js/utils.js"></script>
 
 <!-- Bootstrap JS — paste before closing </body> -->

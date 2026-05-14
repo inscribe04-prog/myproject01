@@ -9,7 +9,7 @@ console.log("register.js loaded");
 
 
 // ════════════════════════════════════════════
-// SECTION 2 — SUBMIT HANDLER
+// SECTION 1 — SUBMIT HANDLER
 // Validates all fields then sends via fetch
 // ════════════════════════════════════════════
 

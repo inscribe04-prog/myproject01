@@ -34,14 +34,16 @@ router.post('/api/entries', async (req, res) => {
   }
   try {
   const sql = `INSERT INTO form_entries
-    (firstname, lastname, ankval, inpass, email, phone, quantity, age, guardian, relstatus, spousename)
+    (firstname, lastname, asin, inpass, email, phone, quantity, age, guardian, relstatus, spousename)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
   await dbQuery(sql, [fn01, fn02, number1, password01, email01, phone01, quantity01, age, guardian, relstatus, spousename]);
   res.status(201).json({ message: 'Entry created successfully' });
 }
     catch (err) {
-       res.status(500).json({error: 'Save failed' });
+       //res.status(500).json({error: 'Save failed' });
+       console.error('CREATE ERROR:', err);
+       res.status(500).json({ error: err.message });
       }
 });
 
@@ -69,7 +71,7 @@ router.put('/api/entries/:id', async (req, res) => {
 
   try {
   const sql = `UPDATE form_entries
-    SET firstname=?, lastname=?, ankval=?, inpass=?, email=?, phone=?,
+    SET firstname=?, lastname=?, asin=?, inpass=?, email=?, phone=?,
         quantity=?, age=?, guardian=?, relstatus=?, spousename=?
     WHERE id=?`;
 
@@ -79,6 +81,7 @@ router.put('/api/entries/:id', async (req, res) => {
      res.status(500).json({ error: 'Update failed' });
   }
 });
+
 
 
 // ── DELETE ───────────────────────────────────────
