@@ -122,7 +122,7 @@ window.schema = {
             kind: 'name',
             required: false,
             min: 3,
-            maxLength: 50,
+            maxLength: 20,
             allowSpaces: false
         },
 

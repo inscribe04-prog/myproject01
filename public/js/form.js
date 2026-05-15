@@ -57,6 +57,7 @@ async function handleSubmit(e) {
 
     const data = ui.getFormData('main');
     const errors = validators.getErrors(data);
+    console.log(errors);
 
     const confirm = document.getElementById(schema.ui.confirmPassword)?.value.trim() || '';
     if (confirm !== (document.getElementById(schema.fields.password.mainId)?.value.trim() || '')) {

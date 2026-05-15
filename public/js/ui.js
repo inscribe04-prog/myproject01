@@ -74,7 +74,23 @@ window.ui = {
             console.warn(`Element not found: ${id}`);
             return;
         }
-        el.addEventListener(event, handler);
+        el.addEventListener(event, (e) => {
+            
+            const fieldKey = Object.keys(schema.fields)
+            .find ((key) =>{
+                const field = schema.fields[key];
+
+                return (
+                    field.mainId === id ||
+                    field.editId === id
+                );
+            });
+            
+            if(fieldKey) {
+                window.ui.clearFieldError(fieldKey);
+            }
+            handler(e);
+        });
     },
 
     async loadWelcomeMessage() {
@@ -98,12 +114,25 @@ window.ui = {
         });
     },
 
+    clearFieldError(fieldKey) {
+
+        const errId =
+            schema.errors[fieldKey];
+        if (!errId) return;
+            const el =
+            document.getElementById(errId);
+        if (!el) return;
+            el.textContent = '';
+            el.classList.add('d-none');
+    },
+
     showErrors(errors) {
         Object.entries(errors).forEach(([key, message]) => {
             const el = document.getElementById(schema.errors[key] || `${key}Err`);
             if (!el) return;
             el.textContent = message;
             el.classList.remove('d-none');
+            el.classList.add('form-error');
         });
     },
 
@@ -128,21 +157,23 @@ window.ui = {
             match.className = 'text-danger small';
         }
 
-        const defaults = {
-            firstname: '0 character',
-            lastname: '0 character',
-            asin: '0 digit',
-            password: '0 character',
-            quantity: '0 digit',
-            phone: '0 digit'
-        };
+        // const defaults = {
+        //     firstname: '0 character',
+        //     lastname: '0 character',
+        //     asin: '0 digit',
+        //     password: '0 character',
+        //     quantity: '0 digit',
+        //     phone: '0 digit'
+        // };
 
         Object.entries(schema.counters).forEach(([key, id]) => {
             const el = document.getElementById(id);
             if (!el) return;
-            el.textContent = defaults[key] || '';
+            el.textContent = '';
             el.style.color = 'gray';
         });
+
+
 
         [schema.sections.guardian.main, schema.sections.spouse.main].forEach((sectionId) => {
             const sectionEl = document.getElementById(sectionId);
@@ -185,7 +216,7 @@ window.ui = {
 
         e.target.value = e.target.value
             .replace(/[^A-Za-z]/g, '')
-            .slice(0, field.maxLength || 50);
+            .slice(0, field.maxLength || 20);
 
         if (mode !== 'main') return;
 
@@ -196,7 +227,7 @@ window.ui = {
         if (!counter) return;
 
         const len = e.target.value.length;
-        counter.textContent = `${len} character${len === 1 ? '' : 's'} entered`;
+        counter.textContent = `${len} character${len >= 2 ? 's' : ''} entered`;
         counter.style.color = len === 0 ? 'gray' : (len < (field.min || 1) ? 'red' : 'green');
     },
 
@@ -216,7 +247,7 @@ window.ui = {
         if (!counter) return;
 
         const len = e.target.value.length;
-        counter.textContent = `${len} digit${len === 1 ? '' : 's'} entered`;
+        counter.textContent = `${len} digit${len >= 2 ? 's' : ''} entered`;
 
         if (len === 0) {
             counter.style.color = 'gray';
@@ -242,9 +273,10 @@ window.ui = {
         const counter = document.getElementById(schema.counters.password);
         if (!counter) return;
 
-        counter.textContent = `${pass.length} character${pass.length !== 1 ? '' : 's'} entered`;
+        counter.textContent = `${pass.length} character${pass.length >= 2 ? 's' : ''} entered`;
         counter.style.color = pass.length === 0 ? 'gray' : (pass.length < field.min ? 'red' : 'green');
     },
+    
 
     handlePasswordMatch() {
         const passEl = document.getElementById(schema.fields.password.mainId);
