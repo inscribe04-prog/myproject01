@@ -39,6 +39,8 @@ const session = require('express-session');
 const app     = express();
 const rateLimit = require('express-rate-limit');
 
+app.set('trust proxy', 1);
+
 
 // ── 1. BODY PARSERS ──────────────────────────
 // ── Middleware ───────────────────────────────
@@ -77,7 +79,7 @@ app.use(session({
     cookie: {
         httpOnly: true,                                // Prevents JS from reading cookies (XSS Protection)
         secure: process.env.NODE_ENV === 'production', // Use HTTPS only in production
-        sameSite: 'strict',                            // Blocks cross-site requests CSRF Protection
+        sameSite: 'lax',                            // Blocks cross-site requests CSRF Protection
         maxAge: 3600000 // 1 hour
     }
 }));
