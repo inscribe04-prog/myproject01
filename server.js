@@ -101,7 +101,11 @@ app.use('/register', authLimiter);
 
 app.use(cors({
     origin: function(origin, callback) {
-        if (!origin || origin.endsWith('.vercel.app')) {
+        if (!origin || 
+            origin.endsWith('.vercel.app') || 
+            origin.endsWith('.railway.app') ||
+            origin === 'http://localhost:5173' ||
+            origin === 'http://localhost:3000') {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
