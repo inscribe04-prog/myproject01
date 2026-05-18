@@ -38,6 +38,8 @@ const express = require('express');
 const session = require('express-session');
 const app     = express();
 const rateLimit = require('express-rate-limit');
+const cors = require('cors');
+
 
 app.set('trust proxy', 1);
 
@@ -79,7 +81,7 @@ app.use(session({
     cookie: {
         httpOnly: true,                                // Prevents JS from reading cookies (XSS Protection)
         secure: process.env.NODE_ENV === 'production', // Use HTTPS only in production
-        sameSite: 'lax',                            // Blocks cross-site requests CSRF Protection
+        sameSite: 'none',                            // Blocks cross-site requests CSRF Protection
         maxAge: 3600000 // 1 hour
     }
 }));
@@ -90,12 +92,17 @@ app.use(session({
 // Must be before auth routes
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minute window
-    max:      5,               // max 5 attempts per window
+    max:      100,               // max 5 attempts per window
     message:  { error: "Too many attempts, please try again later." }
 });
 
 app.use('/login',    authLimiter);
 app.use('/register', authLimiter);
+
+app.use(cors({
+    origin: 'https://myproject01-react-mapu2b3m6-ankit-cbiq-s-projects.vercel.app',
+    credentials: true
+}));
 
 // ── 4. LOGGING ───────────────────────────────
 // Middleware for Logging: A custom middleware in server.js that logs every request to the console with a timestamp. 
@@ -152,7 +159,10 @@ app.get('/form.htm', requireLogin, (req, res) => {
 
 // Add a /me route — returns current user's info as JSON
 app.get('/me', requireLogin, (req, res) => {
+    if (!req.session.user) { 
     res.json(req.session.user);
+}
+res.json(req.session.user);
 });
 
 // ── Form CRUD routes ─────────────────────────
