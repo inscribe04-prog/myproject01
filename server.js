@@ -36,13 +36,14 @@ require('dotenv').config();
 
 const express = require('express');
 const session = require('express-session');
-const app     = express();
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
+const path = require('path');
+const app     = express();
 
+// ──  TRUST PROXY ───────────────────────────
 
 app.set('trust proxy', 1);
-
 
 // ── 1. BODY PARSERS ──────────────────────────
 // ── Middleware ───────────────────────────────
@@ -55,12 +56,10 @@ app.use(express.urlencoded({ extended: true }));
 // ADD THIS: Parses incoming JSON data (Crucial for modern APIs)
 app.use(express.json()); 
 
-
 // ── 2. SESSION ───────────────────────────────
 // One session() call — with secure cookie config
 // Registers session middlewareMust be before any route that reads req.session
 // // Must be registered BEFORE routes that use sessions.
-
 
 app.use(session({
 
@@ -81,7 +80,7 @@ app.use(session({
     cookie: {
         httpOnly: true,                                // Prevents JS from reading cookies (XSS Protection)
         secure: process.env.NODE_ENV === 'production', // Use HTTPS only in production
-        sameSite: 'none',                            // Blocks cross-site requests CSRF Protection
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',                           // Blocks cross-site requests CSRF Protection
         maxAge: 3600000 // 1 hour
     }
 }));
@@ -98,6 +97,8 @@ const authLimiter = rateLimit({
 
 app.use('/login',    authLimiter);
 app.use('/register', authLimiter);
+
+// ── CORS ──────────────────────────────────
 
 app.use(cors({
     origin: function(origin, callback) {
@@ -123,9 +124,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// ── 5. STATIC FILES ──────────────────────────
-// Serves everything in /public (index.htm, register.htm, /js, /css)
-app.use(express.static('public'));
 
 // ── 6. requireLogin HELPER ───────────────────
 // Defined before the routes that use it
@@ -138,17 +136,6 @@ function requireLogin(req, res, next) {
 }
 
 
-
-// ADD IT HERE
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index.htm');
-});
-
-// ── 7. ROUTES ────────────────────────────────
-// Root → login page
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index.htm');
-});
 
 // ── Auth routes ──────────────────────────────
 // Auth (login, register, logout)
@@ -180,6 +167,115 @@ res.json(req.session.user);
 // routes directly at the root path /
 const formRoutes = require('./routes/formRoutes');
 app.use('/', formRoutes);
+
+
+// ── 5. STATIC FILES ──────────────────────────
+// Serves everything in /public (index.htm, register.htm, /js, /css)
+app.use(express.static('public'));
+
+
+// Serve React frontend
+app.use(express.static(path.join(__dirname, 'dist')));
+
+app.get('/{*path}', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+// // ── 5. STATIC FILES ──────────────────────────
+// // Serves everything in /public (index.htm, register.htm, /js, /css)
+// app.use(express.static('public'));
+
+// // ── 6. requireLogin HELPER ───────────────────
+// // Defined before the routes that use it
+// function requireLogin(req, res, next) {
+//     if (!req.session.user) {
+//         res.redirect('/index.htm');
+//         return;
+//     }
+//     next();
+// }
+
+
+// ── Auth routes ──────────────────────────────
+// Auth (login, register, logout)
+// const authRoutes = require('./routes/authRoutes');
+// app.use('/', authRoutes);
+
+// // ── Protected page ───────────────────────────
+// // requireLogin runs first — if it calls next(), this handler runs
+// // if not, user is redirected before reaching sendFile
+// app.get('/form.htm', requireLogin, (req, res) => {
+  
+//   // __dirname = the folder where server.js lives
+//   // this sends the actual HTML file to the browser
+//     res.sendFile(__dirname + '/views/form.htm');
+// });
+
+// // Current logged in user info ─── /me route
+
+// // Add a /me route — returns current user's info as JSON
+// app.get('/me', requireLogin, (req, res) => {
+//     if (!req.session.user) { 
+//     res.json(req.session.user);
+// }
+// res.json(req.session.user);
+// });
+
+// // ── Form CRUD routes ─────────────────────────
+// // Import the form routes file and mount all its
+// // routes directly at the root path /
+// const formRoutes = require('./routes/formRoutes');
+// app.use('/', formRoutes);
+
+
+// ADD IT HERE
+// app.get('/', (req, res) => {
+//     res.sendFile(__dirname + '/public/index.htm');
+// });
+
+// // ── 7. ROUTES ────────────────────────────────
+// // Root → login page
+// app.get('/', (req, res) => {
+//     res.sendFile(__dirname + '/public/index.htm');
+// });
+
+// // ── Auth routes ──────────────────────────────
+// // Auth (login, register, logout)
+// const authRoutes = require('./routes/authRoutes');
+// app.use('/', authRoutes);
+
+// // ── Protected page ───────────────────────────
+// // requireLogin runs first — if it calls next(), this handler runs
+// // if not, user is redirected before reaching sendFile
+// app.get('/form.htm', requireLogin, (req, res) => {
+  
+//   // __dirname = the folder where server.js lives
+//   // this sends the actual HTML file to the browser
+//     res.sendFile(__dirname + '/views/form.htm');
+// });
+
+// // Current logged in user info ─── /me route
+
+// // Add a /me route — returns current user's info as JSON
+// app.get('/me', requireLogin, (req, res) => {
+//     if (!req.session.user) { 
+//     res.json(req.session.user);
+// }
+// res.json(req.session.user);
+// });
+
+// // ── Form CRUD routes ─────────────────────────
+// // Import the form routes file and mount all its
+// // routes directly at the root path /
+// const formRoutes = require('./routes/formRoutes');
+// app.use('/', formRoutes);
+
+// // // Serve React frontend
+// // app.use(express.static(path.join(__dirname, 'dist')));
+
+// // app.get('/{*path}', (req, res) => {
+// //     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+// // });
 
 // ── 8. START SERVER ──────────────────────────
 // Always the last line
