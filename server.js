@@ -86,6 +86,15 @@ app.use(session({
 }));
 
 
+function requireAdmin(req, res, next) {
+    if (!req.session.user || !req.session.user.isAdmin) {
+        return res.status(403).json({ error: 'Admin access required' });
+    }
+    next();
+}
+
+
+
 // ── 3. RATE LIMITER ──────────────────────────
 // Blocks brute-force login/register attempts
 // Must be before auth routes
@@ -167,6 +176,9 @@ res.json(req.session.user);
 // routes directly at the root path /
 const formRoutes = require('./routes/formRoutes');
 app.use('/', formRoutes);
+
+const adminRoutes = require('./routes/adminRoutes');
+app.use('/', requireAdmin, adminRoutes);
 
 
 // ── 5. STATIC FILES ──────────────────────────

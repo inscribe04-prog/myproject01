@@ -74,7 +74,8 @@ router.post('/login', async (req, res) => {
     // save to session — never save the password
     req.session.user = {
       id: user.id, firstname: user.firstname,
-      lastname: user.lastname, email: user.email
+      lastname: user.lastname, email: user.email,
+      isAdmin: user.isAdmin
     };
 
     res.json({ success: true });
