@@ -2,8 +2,17 @@ const express = require('express');
 const router = express.Router();
 const dbQuery = require('../config/dbHelper');
 
-// GET all users
-router.get('/admin/users', async (req, res) => {
+
+function requireAdmin(req, res, next) {
+    if (!req.session.user || !req.session.user.isAdmin) {
+        return res.status(403).json({ error: 'Admin access required' });
+    }
+    next();
+}
+
+
+router.get('/admin/users', requireAdmin, async (req, res) => {
+
     try {
         const users = await dbQuery('SELECT id, firstname, lastname, email, isAdmin FROM users', []);
         res.json(users);
@@ -11,9 +20,8 @@ router.get('/admin/users', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+router.delete('/admin/users/:id', requireAdmin, async (req, res) => {
 
-// DELETE user
-router.delete('/admin/users/:id', async (req, res) => {
     try {
         await dbQuery('DELETE FROM users WHERE id=?', [req.params.id]);
         res.json({ message: 'User deleted' });
@@ -22,8 +30,8 @@ router.delete('/admin/users/:id', async (req, res) => {
     }
 });
 
-// TOGGLE admin
-router.put('/admin/users/:id/admin', async (req, res) => {
+router.put('/admin/users/:id/admin', requireAdmin, async (req, res) => {
+
     try {
         await dbQuery('UPDATE users SET isAdmin=? WHERE id=?', [req.body.isAdmin, req.params.id]);
         res.json({ message: 'Updated' });
@@ -31,5 +39,35 @@ router.put('/admin/users/:id/admin', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
+// // GET all users
+// router.get('/admin/users', async (req, res) => {
+//     try {
+//         const users = await dbQuery('SELECT id, firstname, lastname, email, isAdmin FROM users', []);
+//         res.json(users);
+//     } catch (err) {
+//         res.status(500).json({ error: err.message });
+//     }
+// });
+
+// // DELETE user
+// router.delete('/admin/users/:id', async (req, res) => {
+//     try {
+//         await dbQuery('DELETE FROM users WHERE id=?', [req.params.id]);
+//         res.json({ message: 'User deleted' });
+//     } catch (err) {
+//         res.status(500).json({ error: err.message });
+//     }
+// });
+
+// // TOGGLE admin
+// router.put('/admin/users/:id/admin', async (req, res) => {
+//     try {
+//         await dbQuery('UPDATE users SET isAdmin=? WHERE id=?', [req.body.isAdmin, req.params.id]);
+//         res.json({ message: 'Updated' });
+//     } catch (err) {
+//         res.status(500).json({ error: err.message });
+//     }
+// });
 
 module.exports = router;
