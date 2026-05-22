@@ -180,6 +180,9 @@ app.use('/', formRoutes);
 const adminRoutes = require('./routes/adminRoutes');
 app.use('/', adminRoutes);
 
+const importRoutes = require('./routes/importRoutes');
+app.use('/', importRoutes);
+
 
 
 // ── 5. STATIC FILES ──────────────────────────
