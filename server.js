@@ -184,10 +184,11 @@ const importRoutes = require('./routes/importRoutes');
 app.use('/', importRoutes);
 
 
-
 // ── 5. STATIC FILES ──────────────────────────
 // Serves everything in /public (index.htm, register.htm, /js, /css)
 app.use(express.static('public'));
+
+
 
 
 // Serve React frontend
