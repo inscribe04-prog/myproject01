@@ -191,12 +191,12 @@ app.use(express.static('public'));
 
 
 
-// Serve React frontend
-app.use(express.static(path.join(__dirname, 'dist')));
+// // Serve React frontend
+// app.use(express.static(path.join(__dirname, 'dist')));
 
-app.get('/{*path}', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
+// app.get('/{*path}', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+// });
 
 
 
