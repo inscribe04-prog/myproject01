@@ -200,10 +200,10 @@ app.use(express.static('public'));
 
 
 
-const path = require('path');
-app.use(express.static(path.join(__dirname, 'client/dist'))); 
-app.get('*', (req, res) => {
-res.sendFile(path.join(__dirname, 'client/dist', 'index.html'));
+
+app.use(express.static(path.join(__dirname, 'dist'))); 
+app.get('/{*path}', (req, res) => {
+res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 // ── 8. START SERVER ──────────────────────────
