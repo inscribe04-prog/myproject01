@@ -40,6 +40,12 @@ const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 const path = require('path');
 const app     = express();
+// const { isAuthenticated, attachUserContext } = require('./middleware/authMiddleware');
+const { 
+    isAuthenticated, 
+    attachUserContext, 
+    requireAdmin 
+} = require('./middleware/authMiddleware');
 
 // ──  TRUST PROXY ───────────────────────────
 
@@ -86,12 +92,20 @@ app.use(session({
 }));
 
 
-function requireAdmin(req, res, next) {
-    if (!req.session.user || !req.session.user.isAdmin) {
-        return res.status(403).json({ error: 'Admin access required' });
-    }
-    next();
-}
+// function requireAdmin(req, res, next) {
+//     if (!req.session.user || !req.session.user.isAdmin) {
+//         return res.status(403).json({ error: 'Admin access required' });
+//     }
+//     next();
+// }
+
+
+// function requireAdmin(req, res, next) {
+//     if (!req.session.user || !req.session.user.isAdmin) {
+//         return res.status(403).json({ error: 'Admin access required' });
+//     }
+//     next();
+// }
 
 
 

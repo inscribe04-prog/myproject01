@@ -1,14 +1,36 @@
 const express = require('express');
 const router = express.Router();
 const dbQuery = require('../config/dbHelper');
+const { requireAdmin } = require('../middleware/authMiddleware');
 
 
-function requireAdmin(req, res, next) {
-    if (!req.session.user || !req.session.user.isAdmin) {
-        return res.status(403).json({ error: 'Admin access required' });
+router.get('/api/dashboard/stats', requireAdmin, async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+                COUNT(*) as totalEntries,
+                COUNT(DISTINCT user_id) as activeContributors,
+                COUNT(CASE WHEN DATE(submitted) = CURDATE() THEN 1 END) as todayEntries
+            FROM form_entries;
+        `;
+        const [results] = await dbQuery(query, []) ;
+
+        let finalStats;
+        if (Array.isArray(results)) {
+            finalStats = results[0];
+        } else {
+            finalStats = results;
+        }
+
+        console.log("Sending finalStats:", finalStats);
+        res.json(finalStats);
+        
+    } catch (err) {
+        console.error('Stats Error:', err);
+        res.status(500).json({ error: 'Failed to fetch dashboard stats' });
     }
-    next();
-}
+    });
+
 
 
 router.get('/admin/users', requireAdmin, async (req, res) => {
@@ -20,6 +42,8 @@ router.get('/admin/users', requireAdmin, async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
+
 router.delete('/admin/users/:id', requireAdmin, async (req, res) => {
 
     try {
@@ -30,6 +54,7 @@ router.delete('/admin/users/:id', requireAdmin, async (req, res) => {
     }
 });
 
+
 router.put('/admin/users/:id/admin', requireAdmin, async (req, res) => {
 
     try {
@@ -39,35 +64,5 @@ router.put('/admin/users/:id/admin', requireAdmin, async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-
-// // GET all users
-// router.get('/admin/users', async (req, res) => {
-//     try {
-//         const users = await dbQuery('SELECT id, firstname, lastname, email, isAdmin FROM users', []);
-//         res.json(users);
-//     } catch (err) {
-//         res.status(500).json({ error: err.message });
-//     }
-// });
-
-// // DELETE user
-// router.delete('/admin/users/:id', async (req, res) => {
-//     try {
-//         await dbQuery('DELETE FROM users WHERE id=?', [req.params.id]);
-//         res.json({ message: 'User deleted' });
-//     } catch (err) {
-//         res.status(500).json({ error: err.message });
-//     }
-// });
-
-// // TOGGLE admin
-// router.put('/admin/users/:id/admin', async (req, res) => {
-//     try {
-//         await dbQuery('UPDATE users SET isAdmin=? WHERE id=?', [req.body.isAdmin, req.params.id]);
-//         res.json({ message: 'Updated' });
-//     } catch (err) {
-//         res.status(500).json({ error: err.message });
-//     }
-// });
 
 module.exports = router;

@@ -12,15 +12,16 @@ const router  = express.Router();
 
 // Import the shared DB connection from config/db.js
 const dbQuery     = require('../config/dbHelper');
+const { isAuthenticated, attachUserContext } = require('../middleware/authMiddleware');
 
 
 // ── CREATE ──────────────────────────────────────
 // POST /RESTful routes  — insert a new form entry
-router.post('/api/entries', async (req, res) => {
+router.post('/api/entries', isAuthenticated, attachUserContext, async (req, res) => {
   const {
     fn01, fn02, number1, password01,
     email01, phone01, quantity01,
-    age, guardian, relstatus, spousename
+    age, guardian, relstatus, spousename, user_id
   } = req.body;
 
   console.log('FULL BODY:', req.body);
@@ -34,10 +35,10 @@ router.post('/api/entries', async (req, res) => {
   }
   try {
   const sql = `INSERT INTO form_entries
-    (firstname, lastname, asin, inpass, email, phone, quantity, age, guardian, relstatus, spousename)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    (firstname, lastname, asin, inpass, email, phone, quantity, age, guardian, relstatus, spousename, user_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-  await dbQuery(sql, [fn01, fn02, number1, password01, email01, phone01, quantity01, age, guardian, relstatus, spousename]);
+  await dbQuery(sql, [fn01, fn02, number1, password01, email01, phone01, quantity01, age, guardian, relstatus, spousename, user_id]);
   res.status(201).json({ message: 'Entry created successfully' });
 }
     catch (err) {
